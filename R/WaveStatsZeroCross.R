@@ -48,7 +48,7 @@
 #' @return A list object containing summary statistic values. 
 #' @references Original MATLAB function by Urs Neumeier 
 #' http://neumeier.perso.ch/matlab/waves.html
-#' @example
+#' @examples
 #' data(wavedata)
 #' waveStatsZeroCross(data = wavedata$SurfaceHeight.m, Fs = 4)
 
