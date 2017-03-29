@@ -10,7 +10,7 @@ BugReports:
 Depends:
     R (>= 3.3.0)
 Imports:
-    oce
+    oce, signal
 Suggests:
     ggplot2,
     scales,
