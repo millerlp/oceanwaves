@@ -80,7 +80,7 @@ PrCorr <- function(pt, Fs, zpt, M = 512, CorrLim = c(0.05, 0.33) ){
 	
 	H <- vector(mode="numeric", length = N) # Make a vector of zeros, length N
 	
-	overlap_window <- hanning(M); # R version of MATLAB's hann() function,
+	overlap_window <- signal::hanning(M); # R version of MATLAB's hann() function,
 								# returns a L-point symmetric Hann window that
 								# is used as an array of coefficients to 
 								# combine overlapping segments
