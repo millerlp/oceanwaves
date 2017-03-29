@@ -42,7 +42,7 @@ wavesp <- function(PT, Zpt, Fs){
 	# equivalent operation. 
 	
 	#%***********************************************************%
-	#	% Calculation of spetral density 
+	#	% Calculation of spectral density 
 	myspec = spec.pgram(PT, detrend = FALSE)
 	p = myspec$spec
 	Snf = p
