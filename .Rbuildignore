@@ -1,0 +1,3 @@
+^README\.Rmd$  # ignore README.md files, usually for github
+
+^notes$
