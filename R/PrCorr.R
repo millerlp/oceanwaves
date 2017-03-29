@@ -1,10 +1,14 @@
-#' PrCorr
-#' 
-#' A function to correct for depth attenuation of a water surface height 
+
+#' Correct for depth attenuation of a water surface height 
 #' pressure signal. 
 #' 
+#' Bottom-mounted pressure transducers suffer from pressure signal 
+#' attenuation when attempting to estimate surface wave heights. This 
+#' function corrected water surface height time series based on the
+#' depth of the water column and height of the sensor above the bottom.
+#' 
 #' @param pt A vector of water surface heights (units of meters usually).
-#' @parma Fs Sampling frequency (units of Hz). Normally 4Hz for an OWHL logger.
+#' @param Fs Sampling frequency (units of Hz). Normally 4Hz for an OWHL logger.
 #' @param zpt Height of the pressure sensor above the seabed (units of meters).
 #' @param M Length of time series segments that will be used in the detrending
 #' and attenuation correction operations. 512 samples is the default, should be
@@ -31,20 +35,8 @@
 #' lines(x = wavedata$DateTime, y = wavedata$SurfaceHeightRaw.m, col = 'red')
 #' legend('topleft',legend=c('Corrected','Raw'),col=c('black','red'),lwd = 2)
 
-PrCorr <- function(pt, Fs, zpt, M = 512, CorrLim = c(0.05, 0.33) ){
-	###### 
-	# Inputs
-	# pt	- A vector of surface height values (meters) derived from the 
-	#			original pressure sensor time series (uncorrected for depth
-	#			attenuation effects)
-	# Fs	- Sampling frequency (Hz). Normally 4 Hz for OWHL logger
-	# zpt	- Height of pressure sensor above seabed (meters)
-	# M		- Length of time series segments that will be used in the 
-	#			detrending and attenuation correction operations. 512 samples
-	#			is the default. Should be an even number.
-	# Corr_lim - [min max] frequency for attenuation correction (Hz, 
-	#                optional, default [0.05 0.33])
-	library(signal) # for hanning() function
+prCorr <- function(pt, Fs, zpt, M = 512, CorrLim = c(0.05, 0.33) ){
+	# library(signal) # for hanning() function
 	
 	# normally the maximum attenuation correction should not be higher than 5
 	max_attenuation_correction <- 5
@@ -109,7 +101,7 @@ PrCorr <- function(pt, Fs, zpt, M = 512, CorrLim = c(0.05, 0.33) ){
 			
 			# Calculate the wave number for each frequency in f, using the
 			# mean sea surface height h for this segment of data
-			K <- WaveNumL(f,h);  # WaveNumL function defined separately
+			K <- waveNumL(f,h);  # waveNumL function defined separately
 			
 			# Correction factor of spectrum for pressure
 			Kpt <- cosh(K*zpt) / cosh(K*h) 
@@ -197,5 +189,27 @@ PrCorr <- function(pt, Fs, zpt, M = 512, CorrLim = c(0.05, 0.33) ){
 	# vector pt. Units should be the same as the original input values
 	# in the vector pt (usually meters).
 	
-}  # end of PrCorr function
+}  # end of prCorr function
+
+
+#' A function to calculate wave number.
+#' 
+#' @param f A numeric vector of wave frequencies
+#' @param h A numeric vector of water depths (usually in units of meters)
+#' @return The wave number. 
+#' @references Original MATLAB function by Urs Neumeier:  
+#' http://neumeier.perso.ch/matlab/waves.html
+#' @author George Voulgaris, SUDO, 1992
+
+waveNumL <- function(f, h) {
+  w <- 2*pi*f
+  dum1 <- (w^2)*h/9.81
+  dum2 <- dum1 + 
+    (1.0+0.6522*dum1 + 0.4622*dum1^2 + 0.0864*dum1^4 + 
+       0.0675*dum1^5)^(-1);
+  dum3 <- sqrt(9.81*h*dum2^(-1)) / f
+  y <- 2*pi*dum3^(-1)
+  y # return y
+}
+
 

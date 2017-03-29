@@ -9,6 +9,8 @@ PrCorr(pt, Fs, zpt, M = 512, CorrLim = c(0.05, 0.33))
 \arguments{
 \item{pt}{A vector of water surface heights (units of meters usually).}
 
+\item{Fs}{Sampling frequency (units of Hz). Normally 4Hz for an OWHL logger.}
+
 \item{zpt}{Height of the pressure sensor above the seabed (units of meters).}
 
 \item{M}{Length of time series segments that will be used in the detrending

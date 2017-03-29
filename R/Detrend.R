@@ -3,13 +3,17 @@
 # Author: Luke Miller  Mar 22, 2017
 ###############################################################################
 
-#' Detrend
+#' Remove trend from a time series
+#' 
 #' Simple function fits a straight line to a vector of values, and uses the
 #' regression coefficients to subtract off the linear trend from the values.
+#'
+#' Returns a series of residuals around the linear trend. 
+#' 
 #' @param pt A vector of numeric values to be detrended
 #' @return A vector of detrended values
 
-Detrend <- function(pt){
+detrend <- function(pt){
 	# Determine length of pt
 	seg_len <- length(pt)
 	# Make a sequence of indices
