@@ -196,6 +196,20 @@ cat('zero-cross T: ',periodZC,"\nraw spectrum T: ",specPeriod,
 cat('raw variance Hsig: ',RawVarHsig,"\nzero-cross Hsig: ",zerocrossHsig, 
     "\nraw spec Hsig: ", rawHsig, "\nband-avg Hsig: ", NDBCbandAvgHsig,'\n')
 
+# Compare to matlab output from wavesp.m, using wavedata.csv file
+# [res,names,spect] = wavesp(pt,[],4,[0.05 0.33],4,'a');
+# 
+# Columns 1 through 6 # Values are from spectral method
+# 'h'        'Hm0'    'Tp'    'm0'    'T_0_1'    'T_0_2'
+# 9.55132   0.67125  13.23529 0.02816 8.15253 7.30436
+# Columns 7 through 11       # Values after EPS4 are from zero-cross routine
+# 'T_pc'    'EPS2'    'EPS4'    'H_significant'    'H_mean'
+# 16.27859   0.49570   0.73221    0.63949         0.41774   
+# Columns 12 through 15  # All values from zero cross routine
+# 'H_10'    'H_max'    'T_mean'    'T_s'
+# 0.75663   0.94534   7.71982  10.78846
+
+
 
 ###########
 # A spectral analysis with no kernal smoothing and no tapering
