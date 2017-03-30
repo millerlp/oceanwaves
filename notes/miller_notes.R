@@ -196,6 +196,85 @@ cat('zero-cross T: ',periodZC,"\nraw spectrum T: ",specPeriod,
 cat('raw variance Hsig: ',RawVarHsig,"\nzero-cross Hsig: ",zerocrossHsig, 
     "\nraw spec Hsig: ", rawHsig, "\nband-avg Hsig: ", NDBCbandAvgHsig,'\n')
 
+
+
+
+################################################################################
+### TEST ONLY - COMPARE TO MATLAB wavesp.m output
+# A spectral analysis with no kernal smoothing and no tapering
+swHeight = wavedata$SurfaceHeight.m
+swHeight = detrend(swHeight)
+Fs = 4 # Sampling frequency
+# swHeight = ts(swHeight, frequency = Fs)
+
+N = length(swHeight)
+# Sum of squared amplitude
+sum(abs(swHeight)^2)  # 107.6604
+# Mean squared amplitude
+sum(swHeight^2)/N  # 0.02990566
+# Fit an untapered, unwindowed spectrum
+myspec = mvspec(swHeight, taper = 0, plot = FALSE, detrend = FALSE)
+# Integrate spectrum by just adding all spec values together
+sum(myspec$spec) # Roughly 1/2 of sum of squared amplitude above  53.83023
+sum(myspec$spec)*2  # 107.6605
+
+mean(swHeight) # should be roughly zero
+mean(swHeight) + myspec$spec[floor(N/2)] + 2*sum(myspec$spec[2:floor(N/2)-1]) # 107.6604
+
+myspecB = spectrum(swHeight, plot = FALSE, taper = 0, method='pgram')
+library(psd)
+myspecBnorm = normalize(myspecB, Fsamp = 4, src = 'double.sided')
+sum(myspecBnorm$spec)  # 107.6605
+
+
+s.fft = fft(swHeight)
+1/N * sum(Mod(s.fft[1:floor(N/2)+1])^2)
+a.PSD = 1/N * 2 * Mod(s.fft[1:(floor(N/2)+1)])^2
+a.PSD[1] = a.PSD[1]/2
+a.PSD[floor(N/2)+1] = a.PSD[floor(N/2)+1]/2
+sum(a.PSD)  # 107.6604
+
+spec.df <- data.frame(freq =myspec$freq, spec = myspec$spec)
+# Attempt to Normalize spectrum
+# spec.df$spec2[1:nrow(spec.df)] = spec.df$spec[1:nrow(spec.df)] * 2 / Fs
+spec.df$spec2[1:nrow(spec.df)] = spec.df$spec[1:nrow(spec.df)] * 2 / Fs
+
+min_frequency = 0.05;	#	% mininum frequency, below which no correction is applied (0.05)
+max_frequency = 0.33;	
+p = spec.df$spec2[2:nrow(spec.df)]
+Snf = p
+F = spec.df$freq[2:nrow(spec.df)]
+#	% frequency range over which the spectrum is integrated for calculation of 
+# the moments
+integmin = which.min(F[F >= 0])	 #% this influences Hm0 and other wave parameters
+integmax = which.max(F[F <= (max_frequency*1.5)])
+
+df = F[1];	#	% bandwidth (Hz)
+moment = numeric(length = 7)
+
+# When i starts at -2, the first operation will be to take the square root
+# of every frequency F (F^-2), multiply that by the spectrum at each frequency,
+# sum all of those values, and multiply by the bandwidth (difference between
+# frequency bands, df). This should be equivalent to m_0, the zeroeth moment
+# of the spectrum (effectively the variance). Each subsequent value of i 
+# produces the next moment (m_1, m_2, m_3 etc.). 
+
+for (i in -2:4){	#		% calculation of moments of spectrum
+  moment[i+3]=sum( (F[integmin:integmax]^i) * Snf[integmin:integmax])*df
+  cat('moment ',i,' ',moment[i+3],'\n')
+}
+m0 = moment[0+3]
+
+# Compare to matlab output from wavesp.m, using wavedata.csv file
+# [res,names,spect] = wavesp(pt,[],4,[0.05 0.33],4,'a');
+# m-2  =  3.73739
+# m-1  =  0.280685
+# m0  =  0.0281617
+# m1  =  0.00345435
+# m2  =  0.000527829
+# m3  =  9.85453e-05
+# m4  =  2.13276e-05
+
 # Compare to matlab output from wavesp.m, using wavedata.csv file
 # [res,names,spect] = wavesp(pt,[],4,[0.05 0.33],4,'a');
 # 
@@ -211,13 +290,9 @@ cat('raw variance Hsig: ',RawVarHsig,"\nzero-cross Hsig: ",zerocrossHsig,
 
 
 
-###########
-# A spectral analysis with no kernal smoothing and no tapering
-swHeight = wavedata$SurfaceHeight.m
-swHeight = detrend(swHeight)
-myspec = mvspec(swHeight, taper = 0, plot = FALSE, detrend = FALSE)
-spec.df <- data.frame(freq =myspec$freq, spec = myspec$spec)
-rawvar = sum(spec.df$spec * (diff(spec.df$freq)[1]))
+# rawvar = sum(spec.df$spec * (diff(spec.df$freq)[1]))
+rawvar2 = sum(spec.df$freq^0 * spec.df$spec2) * diff(spec.df$freq)[1]
+rawvar = sum(spec.df$spec)* diff(spec.df$freq)[1]
 rawHsigNoFilt = 4 * sqrt(rawvar)
 # Extract the frequency associated with the peak spectral density
 rawfreq = spec.df$freq[which.max(spec.df$spec)]
