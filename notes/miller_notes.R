@@ -198,6 +198,7 @@ lines(nyfreqs[-1],Snew[-1], col = 'blue')
 
 ###
 # Use spec.pgram, with smoothers
+xt = ts(x, frequency = fsamp)
 pgram20 <- spec.pgram(xt, spans = c(9,9,9), taper=0.1, plot=FALSE)
 pgram20m0 = (fsamp*mean(pgram20$spec))
 df = pgram20$freq[2]-pgram20$freq[1] # bandwidth (Hz) (should be same as values from diff(nyfreqs)
@@ -226,7 +227,52 @@ lines(pgram20$freq,2*pgram20$spec, col = rgb(0,1,0))
 # End of matlab/spectrum comparison section
 ####################################################################
 
+
+
 ################################################################################
+# Try the welchPSD windowing function to compute Power Spectral Density
+library(bspec)
+# This function should approximate the old MATLAB spectrum function, which also
+# used Welch's method of windowing data. It is not an exact match for the 
+# wavesp.m MATLAB output, but it's close. 
+wpsd = welchPSD(xt, seglength=225,two.sided=FALSE,method='mean',
+		windowingPsdCorrection=TRUE)
+# Remove the zero-frequency entry
+wpsd$frequency = wpsd$frequency[-1]
+# Remove the zero-frequency entry from power as well
+wpsd$power = wpsd$power[-1] #  * 2/fsamp # If using two.sided=TRUE, don't multiply by 2/fsamp
+
+df = wpsd$frequency[2]-wpsd$frequency[1] # delta-frequency (should be same as values from diff(nyfreqs)
+integmin=min(which(wpsd$frequency >= 0)); # this influences Hm0 and other wave parameters
+min_frequency = 0.05 # from wavesp.m 
+max_frequency = 0.33 # from wavesp.m 
+integmax=max(which(wpsd$frequency <= max_frequency*1.5 ));
+moment = vector(length = 7)
+for (i in seq(-2,4,by=1)) { # calculation of moments of spectrum
+	# Note that the wpsd$power values are multiplied by 2 to normalize them
+	# in the same fashion as a raw power spectral density estimator
+	moment[i+3]=sum(wpsd$frequency[integmin:integmax]^i*
+					(2*wpsd$power[integmin:integmax]))*df;
+}
+m0 = moment[3];
+Hm0 = 4 * sqrt(m0)
+T_0_1 = moment[3]/moment[1+3] # average period m0/m1
+T_0_2 = (moment[0+3]/moment[2+3])^0.5 # average period (m0/m2)^0.5
+T_pc = moment[-2+3]*moment[1+3]/(moment[0+3]^2) # calculated peak period
+EPS2 = (moment[0+3]*moment[2+3]/moment[1+3]^2-1)^0.5;  # spectral width parameter
+EPS4 = (1 - moment[2+3]^2/(moment[0+3]*moment[4+3]))^0.5;
+Tp = 1/wpsd$frequency[which.max(wpsd$power)] 
+# Calculate variance as the sum of power times 2, divided by number of frequencies 
+# times the Nyquist frequency (which is equal to the width of each frequency band)
+welchvar = (2*sum(wpsd$power))/(length(wpsd$frequency))*(fsamp/2)
+# The variance above will not be exactly the same as the var(xt) of the original
+# full-length time series, since the welch's estimate is based on averaging
+# the spectra from several shorter windows of the original full-length timeseries
+# But it ought to be close
+welchvar/var(xt)
+
+# Plot the smoothed periodogram, being sure to multiply x2 to match raw PSD
+lines(wpsd$frequency,wpsd$power, col = rgb(1,0,1))
 
 
 
