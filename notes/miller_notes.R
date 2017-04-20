@@ -572,15 +572,16 @@ waves = rvec_to_matlab(wavedata$SurfaceHeight.m)
 # Generate a script file to call inside MATLAB
 code = c("cd('D:/MATLAB/work/waves');",
 		paste0("PT = ",waves), 
-		"[res,names]=wavesp(PT,[],4);", 
+		"[res,names]=wavesp(PT,[],4,'az');", 
 		"cd('D:/R_public/oceanwaves/notes');",
 		"save('test.txt', 'res', '-ascii','-tabs')")
 res = run_matlab_code(code) # Run the code in MATLAB
 # Read in the output file produced by wavesp function in MATLAB
 output = read.table(file = './notes/test.txt',sep = '\t',
-		col.names=c( 'h','Hm0','Tp','m0','H_significant','H_mean','H_10',
+		col.names=c( 'h','Hm0','Tp','m0','T_0_1','T_0_2','T_pc',
+				'EPS2','EPS4','H_significant','H_mean','H_10',
 				'H_max','T_mean','T_s'),
-		colClasses = rep('numeric',10))
+		colClasses = rep('numeric',15))
 output
 
 
