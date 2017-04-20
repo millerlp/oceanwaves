@@ -5,14 +5,15 @@
 
 #' Remove trend from a time series
 #' 
-#' Simple function fits a straight line to a vector of values, and uses the
+#' Fits a straight line to a vector of values using lm(), and uses the
 #' regression coefficients to subtract off the linear trend from the values.
-#'
-#' Returns a series of residuals around the linear trend. 
+#' Returns a series of residuals around the linear trend.
+#' Typically this is used to remove a tidal trend from a ocean 
+#' surface height time series before attempting to calculate statistics for 
+#' waves, which are variations above and below the mean surface height. 
 #' 
 #' @param pt A vector of numeric values to be detrended
 #' @return A vector of detrended values
-#' @export
 
 DetrendHeight <- function(pt){
 	# Determine length of pt
