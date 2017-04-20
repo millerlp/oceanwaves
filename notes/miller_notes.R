@@ -1,7 +1,8 @@
 setwd("D:/R_public/oceanwaves") # package must be the working directory
 setwd("~/R_public/oceanwaves") # package must be the working directory
 library(devtools)  # load devtools
-build()
+devtools::document() # Regenerate documents, help files, namespace etc
+build() # Generate a tar.gz file of the entire package
 install() # Re-install oceanwaves after an update
 load_all() # Actually load the functions in oceanwaves 
 
