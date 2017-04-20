@@ -1,4 +1,4 @@
-
+setwd("D:/R_public/oceanwaves") # package must be the working directory
 setwd("~/R_public/oceanwaves") # package must be the working directory
 library(devtools)  # load devtools
 build()
@@ -561,3 +561,28 @@ ggplot(data = subset(spec.df, freq > 1/(maxPeriod*4) & freq < 1/(minPeriod*4) ))
   ylab('Spectrum') +
   labs(color='Taper') + 
   ggtitle('A') + theme(plot.title=element_text(hjust=0)) 
+
+################################################################################
+
+library(matlabr)
+options(matlab.path = "C:\\Program Files (x86)\\MATLAB\\R2013a Student\bin")
+have_matlab() # test that MATLAB was found
+# Convert surface height timeseries into character vector for MATLAB
+waves = rvec_to_matlab(wavedata$SurfaceHeight.m)
+# Generate a script file to call inside MATLAB
+code = c("cd('D:/MATLAB/work/waves');",
+		paste0("PT = ",waves), 
+		"[res,names]=wavesp(PT,[],4);", 
+		"cd('D:/R_public/oceanwaves/notes');",
+		"save('test.txt', 'res', '-ascii','-tabs')")
+res = run_matlab_code(code) # Run the code in MATLAB
+# Read in the output file produced by wavesp function in MATLAB
+output = read.table(file = './notes/test.txt',sep = '\t',
+		col.names=c( 'h','Hm0','Tp','m0','H_significant','H_mean','H_10',
+				'H_max','T_mean','T_s'),
+		colClasses = rep('numeric',10))
+output
+
+
+
+
