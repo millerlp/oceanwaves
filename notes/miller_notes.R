@@ -29,6 +29,206 @@ myperiod = 1/myfreq
 # the real value, so divide by 4 to get the actual peak period in seconds
 specPeriod = myperiod / 4
 
+#####################
+# Try welchPSD function from bspec package
+#install.packages('bspec')
+library(bspec)
+data(lh)
+tsval = lh
+tsval = as.ts(wavedata$SurfaceHeight.m, start=c(1,1), frequency = 4)
+spec1 = empiricalSpectrum(tsval,two.sided=TRUE)
+plot(spec1$frequency[-1],spec1$power[-1],log='y',type='l')
+spec2 = spectrum(tsval,plot=FALSE)
+lines(spec2$freq,spec2$spec,col='red')
+spec3 = welchPSD(tsval,seglength=450,method='mean')
+lines(spec3$frequency,spec3$power, col = 'blue')
+
+
+###############################################################################
+# From https://cran.r-project.org/web/packages/psd/vignettes/normalization.pdf
+# Normalization of Power Spectral Density estimates
+set.seed(1234)
+N <- 1028
+x <- rnorm(N, mean = 0, sd = 1)
+# Load signal processing
+library(signal, warn.conflicts=FALSE)
+# Construct an FIR filter
+f <- c(0, 0.2, 0.2, 0.3, 0.3, 0.5)*2
+m <- c(0, 0, 1, 1, 0, 0)
+fw <- signal::fir2(N, f, m)
+# complex filter response
+fh <- signal::freqz(fw, Fs=1)
+f <- c(0, 0.12, 0.12, 0.22, 0.22, 0.5)*2
+fwl <- signal::fir2(N, f, m)
+fhl <- signal::freqz(fwl, Fs=1)
+f <- c(0, 0.28, 0.28, 0.38, 0.38, 0.5)*2
+fwu <- signal::fir2(N, f, m)
+fhu <- signal::freqz(fwu, Fs=1)
+# convolution
+xf <- signal::filter(fw, x)
+# PSD using stats::spectrum
+Sx <- spectrum(x, pad=1, plot=FALSE, taper=0.2)
+Sxf <- spectrum(xf, pad=1, plot=FALSE, taper=0.2)
+plot(Sx$freq,Sx$spec,type='l',col='grey70', log='y',ylim=c(1e-12,1e1))
+lines(Sxf$freq,Sxf$spec,col='black')
+
+xv = var(x)  # x should be from rnorm(length = 1028, mean=0, sd=1) above
+X = fft(x) # carry out Fast Fourier Transform
+# 
+Sa = Mod(X) # amplitude spectrum (if you square this, you get energy spectral density)
+Sp = Arg(X) # phase spectrum
+XC = Conj(X) # conjugate of spectrum
+all.equal(Se <- Sa^2, Se_2 <- Mod(XC * X), Se_2R <- Mod(X * XC))
+
+fsamp <- 1 # sampling freq, e.g. Hz
+fNyq <- fsamp/2 # Nyquist freq
+Nf <- N/2 # number of freqs
+nyfreqs <- seq.int(from=0, to=fNyq, length.out=Nf)
+S <- Se[2:(Nf+1)] * 2 / N # Finally, the PSD!
+
+# 0) Setup optimization function for dof, using conjugate gradients\\
+# min L1 |PSD - Chi^2(dof)|
+Chifit <- function(PSD){optim(list(df=mean(PSD)), function(dof){
+				sum(log(PSD)) - sum(log(dchisq(PSD, dof))) }, method="CG")}
+# 1) run optimization
+Schi <- Chifit(S)
+# Get 'df', the degrees of freedom, should be very close to the mean mSn below
+print(dof <- Schi$par[[1]])
+# compare with the mean and median
+c(mSn <- mean(S), median(S))
+
+mSn <- dof
+test_norm <- function(sval, nyq, xvar){svar <- sval * nyq; return(svar/xvar)}
+print(xv_1 <- test_norm(mSn, fNyq, xv))
+## [1] 1.003214 Should be close to 1 if the two variance estimates match
+xv_2 <- sum(S)/Nf * fNyq / xv # an alternate test
+all.equal(xv_1, xv_2)
+
+
+# Change sampling frequency and re-scale to get properly normalized spectra
+fsamp <- 4  #20
+fNyq <- fsamp / 2
+freqs <- fsamp * nyfreqs # rescaling original frequencies from 1Hz to 20Hz
+Snew <- S / fsamp # S was our original PSD from above
+# Test variance crudely
+mSn <- mean(Snew)
+test_norm(mSn, fNyq, xv)
+## [1] 0.9990345
+
+fsamp <- 4  #20
+xt <- ts(x, frequency=fsamp)
+pgram20 <- spec.pgram(xt, pad=1, taper=0, plot=FALSE)
+pgram01 <- spec.pgram(ts(xt, frequency=1), pad=1, taper=0, plot=FALSE)
+mSn/mean(pgram20$spec) # This will be off by a factor of 2
+pgram20Norm = (2*mean(pgram20$spec)) # Normalize spectrum() output by multiplying by 2
+mSn/pgram20Norm # This should be ~1.0
+
+
+################################################################################
+# Wave data PSD
+# Calculate variance of wave data (detrended to zero mean)
+# The code below pretty much replicates the output of the matlab wavesp.m 
+# spectral analysis methods, when the matlab spectrum options are set to 
+# not window the data at all (bw = 0.001111). Note that the T_pc peak period
+# will be unrealistic with this method, and appears to require at least some
+# windowing to bring it into the realistic realm.
+N = length(wavedata$SurfaceHeight.m) # sample size
+fsamp = 4 # sampling rate (Hz)
+x = detrend(wavedata$SurfaceHeight.m)
+#x <- rnorm(N, mean = 0, sd = 1)  # alternate simple test with known variance
+# Calculate variance of the timeseries using the var() function
+xv = var(x)
+# Calculate fast fourier transform
+X = fft(x)
+Sa = Mod(X) # calculate amplitude spectrum 
+Se = Sa^2 # convert to energy spectral density
+
+fNyq = fsamp/2 # Nyquist frequency (half of sampling rate)
+Nf = N/2 # Half of sample size
+# Generate a set of frequencies from 0 to Nyquist frequency
+nyfreqs = seq.int(from=0, to=fNyq, length.out=Nf) # original 
+nyfreqs = seq.int(from=0, to=fNyq, length.out=Nf+1) # Modified: matches wavesp.m
+nyfreqs = nyfreqs[-1] # Modified: Remove first value if you do Nf+1 above
+# Calculate the PSD from the energy spectral density
+S <- Se[2:(Nf+1)] * 2 / N # original
+
+Snew = S / fsamp # Rescale spectrum by sampling frequency (Hz)
+myvar = function(S,Nf,fNyq){ # Calculate variance
+	sum(S)/ Nf * fNyq
+}
+print(fftvar <- myvar(Snew,Nf,fNyq))
+xv
+fftvar/xv # should equal ~1 if the spectral method is matching the var() output
+
+print(Hs <- 4 * sqrt(fftvar)) # Calculate sig. wave height as 4*sqrt(variance)
+print(Hs2 <- 4 * sqrt(xv)) # Calculate sig. wave height as 4*sqrt(variance)
+# Frequency at maximum of spectrum (converted to period)
+Tp = 1/nyfreqs[which.max(Snew)] 
+
+#% frequency range over which the spectrum is integrated for calculation of the moments
+integmin=min(which(nyfreqs >= 0)); # this influences Hm0 and other wave parameters
+min_frequency = 0.05 # from wavesp.m 
+max_frequency = 0.33 # from wavesp.m 
+integmax=max(which(nyfreqs <= max_frequency*1.5 ));
+
+df = nyfreqs[2]-nyfreqs[1] # bandwidth (Hz) (should be same as values from diff(nyfreqs)
+moment = vector(length = 7)
+for (i in seq(-2,4,by=1)) { # calculation of moments of spectrum
+	moment[i+3]=sum(nyfreqs[integmin:integmax]^i*Snew[integmin:integmax])*df;
+}						
+		
+m0 = moment[3];
+Hm0 = 4 * sqrt(m0)
+T_0_1 = moment[3]/moment[1+3] # average period m0/m1
+T_0_2 = (moment[0+3]/moment[2+3])^0.5 # average period (m0/m2)^0.5
+T_pc = moment[-2+3]*moment[1+3]/(moment[0+3]^2) # calculated peak period
+EPS2 = (moment[0+3]*moment[2+3]/moment[1+3]^2-1)^0.5;  # spectral width parameter
+EPS4 = (1 - moment[2+3]^2/(moment[0+3]*moment[4+3]))^0.5; # spectral width parameter
+
+# Plot the basic spectrum
+plot(nyfreqs[-1],Snew[-1], type = 'n',col='blue',log='xy',
+		ylab = expression(m^2/Hz), xlab = 'Frequency, Hz')
+abline(v = (1/Tp), lty = 2, col = 'grey50') # peak period
+ax2 = axTicks(side = 3, log=TRUE,nintLog = 8)
+axis(side=3,at=ax2, labels = 1/ax2)
+mtext(side = 3, text = 'Period, s', line = 2.75)
+lines(nyfreqs[-1],Snew[-1], col = 'blue')
+####
+
+
+###
+# Use spec.pgram, with smoothers
+pgram20 <- spec.pgram(xt, spans = c(9,9,9), taper=0.1, plot=FALSE)
+pgram20m0 = (fsamp*mean(pgram20$spec))
+df = pgram20$freq[2]-pgram20$freq[1] # bandwidth (Hz) (should be same as values from diff(nyfreqs)
+integmin=min(which(pgram20$freq >= 0)); # this influences Hm0 and other wave parameters
+min_frequency = 0.05 # from wavesp.m 
+max_frequency = 0.33 # from wavesp.m 
+integmax=max(which(pgram20$freq <= max_frequency*1.5 ));
+moment = vector(length = 7)
+for (i in seq(-2,4,by=1)) { # calculation of moments of spectrum
+	# Note that the pgram20$spec values are multiplied by 2 to normalize them
+	# in the same fashion as a raw power spectral density estimator
+	moment[i+3]=sum(pgram20$freq[integmin:integmax]^i*
+					(2*pgram20$spec[integmin:integmax]))*df;
+}	
+m0 = moment[3];
+Hm0 = 4 * sqrt(m0)
+T_0_1 = moment[3]/moment[1+3] # average period m0/m1
+T_0_2 = (moment[0+3]/moment[2+3])^0.5 # average period (m0/m2)^0.5
+T_pc = moment[-2+3]*moment[1+3]/(moment[0+3]^2) # calculated peak period
+EPS2 = (moment[0+3]*moment[2+3]/moment[1+3]^2-1)^0.5;  # spectral width parameter
+EPS4 = (1 - moment[2+3]^2/(moment[0+3]*moment[4+3]))^0.5;
+Tp = 1/pgram20$freq[which.max(pgram20$spec)] 
+# Plot the smoothed periodogram, being sure to multiply x2 to match raw PSD
+lines(pgram20$freq,2*pgram20$spec, col = rgb(0,1,0))
+
+# End of matlab/spectrum comparison section
+####################################################################
+
+################################################################################
+
+
 
 
 ################################################################################
