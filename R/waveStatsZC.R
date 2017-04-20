@@ -25,6 +25,7 @@
 #' @examples
 #' data(wavedata)
 #' waveStatsZC(data = wavedata$SurfaceHeight.m, Fs = 4)
+#' @export
 
 waveStatsZC <- function(data, Fs, threshold = NULL, plot = FALSE){
 	# Sanity checks
