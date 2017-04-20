@@ -4,18 +4,19 @@ Version: 0.0.1
 Date: 2017-03-22
 Author: Luke Miller <contact@lukemiller.org>
 Maintainer: Luke Miller <contact@lukemiller.org>
-Description: Calculate ocean wave height summary statistics from pressure sensor data
+Description: Calculate ocean wave height summary statistics from pressure sensor
+    data
 URL: 
 BugReports: 
 Depends:
     R (>= 3.3.0)
 Imports:
-    oce, signal
+    oce,
+    signal
 Suggests:
     ggplot2,
     scales,
 License: GPL-3 + file LICENSE
 Encoding: UTF-8
 LazyData: true
-RoxygenNote: 6.0.1
-
+RoxygenNote: 5.0.1
