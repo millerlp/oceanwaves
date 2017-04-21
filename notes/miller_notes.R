@@ -9,7 +9,7 @@ load_all() # Actually load the functions in oceanwaves
 data(wavedata) # Load the example wave data
 
 # Basic estimation of significant wave height using surface height variance
-myx = detrend(wavedata$SurfaceHeight.m)
+myx = detrendHeight(wavedata$SurfaceHeight.m)
 varx = var(myx)  # Variance of surface height, after detrending
 RawVarHsig = 4*sqrt(varx) # 4 times square root of surface height variance, sig H?
 
@@ -135,7 +135,7 @@ mSn/pgram20Norm # This should be ~1.0
 # windowing to bring it into the realistic realm.
 N = length(wavedata$SurfaceHeight.m) # sample size
 fsamp = 4 # sampling rate (Hz)
-x = detrend(wavedata$SurfaceHeight.m)
+x = detrendHeight(wavedata$SurfaceHeight.m)
 #x <- rnorm(N, mean = 0, sd = 1)  # alternate simple test with known variance
 # Calculate variance of the timeseries using the var() function
 xv = var(x)
@@ -286,7 +286,7 @@ seg_len = length(swHeight)
 secs = seq(0,seg_len, by = 0.25)  # 4Hz data = 0.25s steps
 x = seq(1,seg_len,by = 1)
 # Remove any linear trend (i.e. tide) from sea water height
-swHeight = detrend(swHeight)
+swHeight = detrendHeight(swHeight)
 
 # Calculate the dominant wave period. 
 # Start with the spectrum periodogram function. The spans are just a 
@@ -360,7 +360,7 @@ NDBCspectrumOld = data.frame(Band = seq(1,33,by=1),
 # the relevant frequencies in each band define in NDBCspectrum. 
 
 swHeight = wavedata$SurfaceHeight.m
-swHeight = detrend(swHeight)
+swHeight = detrendHeight(swHeight)
 myspec = mvspec(swHeight, spans=c(13,11,3), taper = 0.5, plot = FALSE)
 spec.df <- data.frame(freq =myspec$freq, spec = myspec$spec)
 
@@ -448,9 +448,9 @@ cat('raw variance Hsig: ',RawVarHsig,"\nzero-cross Hsig: ",zerocrossHsig,
 
 ################################################################################
 ### TEST ONLY - COMPARE TO MATLAB wavesp.m output
-# A spectral analysis with no kernal smoothing and no tapering
+# A spectral analysis with no kernel smoothing and no tapering
 swHeight = wavedata$SurfaceHeight.m
-swHeight = detrend(swHeight)
+swHeight = detrendHeight(swHeight)
 Fs = 4 # Sampling frequency
 # swHeight = ts(swHeight, frequency = Fs)
 
@@ -565,26 +565,149 @@ ggplot(data = subset(spec.df, freq > 1/(maxPeriod*4) & freq < 1/(minPeriod*4) ))
 
 ################################################################################
 
-library(matlabr)
-options(matlab.path = "C:\\Program Files (x86)\\MATLAB\\R2013a Student\bin")
-have_matlab() # test that MATLAB was found
+
+#have_matlab() # test that MATLAB was found
+
+matlabwaves <- function(waves, Fs = 4) {
+	library(matlabr)
+	options(matlab.path = "C:\\Program Files (x86)\\MATLAB\\R2013a Student\bin")
 # Convert surface height timeseries into character vector for MATLAB
-waves = rvec_to_matlab(wavedata$SurfaceHeight.m)
+	waves = rvec_to_matlab(wavedata$SurfaceHeight.m)
 # Generate a script file to call inside MATLAB
-code = c("cd('D:/MATLAB/work/waves');",
-		paste0("PT = ",waves), 
-		"[res,names]=wavesp(PT,[],4,'az');", 
-		"cd('D:/R_public/oceanwaves/notes');",
-		"save('test.txt', 'res', '-ascii','-tabs')")
-res = run_matlab_code(code) # Run the code in MATLAB
+	code = c("cd('D:/MATLAB/work/waves');",
+			paste0("PT = ",waves), 
+			paste0("[res,names]=wavesp(PT,[],",Fs,",'az');"), 
+			"cd('D:/R_public/oceanwaves/notes');",
+			"save('test.txt', 'res', '-ascii','-tabs')")
+	res = run_matlab_code(code, verbose=FALSE) # Run the code in MATLAB
 # Read in the output file produced by wavesp function in MATLAB
-output = read.table(file = './notes/test.txt',sep = '\t',
-		col.names=c( 'h','Hm0','Tp','m0','T_0_1','T_0_2','T_pc',
-				'EPS2','EPS4','H_significant','H_mean','H_10',
-				'H_max','T_mean','T_s'),
-		colClasses = rep('numeric',15))
-output
+	output = read.table(file = './notes/test.txt',sep = '\t',
+			col.names=c( 'h','Hm0','Tp','m0','T_0_1','T_0_2','T_pc',
+					'EPS2','EPS4','H_significant','H_mean','H_10',
+					'H_max','T_mean','T_s'),
+			colClasses = rep('numeric',15))
+	output
+}
+################################################################################
+mywaves = wavedata$SurfaceHeight.m
 
-
-
-
+# Function to run full comparison of MATLAB and R methods, and plot results
+runcomparison <- function(mywaves, Fs = 4, plot = FALSE){
+# Run the matlab analysis
+	matwaves = matlabwaves(mywaves, Fs = Fs)
+# Run the R zero-cross version
+	Rzc = waveStatsZC(mywaves,Fs = Fs)
+# Run the R spectral analysis version
+	Rsp = waveStatsSP(mywaves,Fs = Fs)
+# Reformat results for easy comparison
+	comparo = data.frame(Stat = colnames(matwaves), 
+			MATLAB = as.vector(unlist(matwaves[1,])),
+			R = c(as.vector(unlist(Rsp[1,])),as.vector(unlist(Rzc[1:6]))))
+	# Calculate difference between MATLAB results and R results
+	comparo$diff = comparo$MATLAB - comparo$R
+	# Also calculate significant wave height directly using the variance
+	# of the wave time series
+	comparo[16,1] = NA
+	comparo[16,2] = NA # This value isn't calculated by MATLAB function
+	comparo[16,3] = 4 * sqrt(var(mywaves))
+	comparo[16,4] = NA
+	# Round off all values to a reasonable precision. Any very small differences
+	# between the two methods will show up as 0. 
+	comparo[,2:4] = round(comparo[,2:4],4)
+	
+	########## 
+	if (plot) {
+		# Plot the comparison results
+		# Begin with wave height estimates
+		par(mfrow = c(2,1),mar = c(5,5,1,1))
+		cexval = 1.5
+		cexaxis = 1.3
+		mybg = 'grey70'
+		plot(x = 0, y = 0,
+				type = 'n',
+				ylim = c(0,max(comparo[c(2,10:13),2:3])),
+#			ylim = c(0,2.5),
+				xlim = c(0.5,5.5),
+				xaxt = 'n',
+				las = 1,
+				ylab = 'Wave height, m', xlab = '',
+				cex.lab = 1.3, cex.axis = cexaxis)
+		rect(par()$usr[1],par()$usr[3],par()$usr[2],par()$usr[4],col=mybg)
+		grid(nx = NA, ny=NULL, col = 'white', lty = 2)
+		# Plot zero-cross Hmean
+		points(x = c(0.9,1.1), y = c(comparo[11,2:3]), col = c('blue','red'),
+				pch = c(19,18), cex = cexval)
+		# Plot spectral Hsig estimate
+		points(x = c(1.9,2.1),y = c(comparo[2,2:3]), col = c('blue','red'),
+				pch = c(19,18), cex = cexval)
+		# Plot zero-cross Hsig estimate
+		points(x = c(2.9,3.1),y = c(comparo[10,2:3]), col = c('blue','red'),
+				pch = c(19,18), cex = cexval)
+		# Plot zero-cross H10 = average height of highest 10% of waves
+		points(x = c(3.9,4.1),y = c(comparo[12,2:3]), col = c('blue','red'),
+				pch = c(19,18), cex = cexval)
+		# Plot zero-cross Hmax = highest overall wave
+		points(x = c(4.9,5.1),y = c(comparo[13,2:3]), col = c('blue','red'),
+				pch = c(19,18), cex = cexval)
+		# Plot point representing the Hsig calculated using timeseries variance
+		points(x = 3.5, y = 4 * sqrt(var(mywaves)), pch = 20, col = 'black',
+				cex = cexval)
+		text(x = 3.5, y = 4 * sqrt(var(mywaves)), pos = 4, 
+				labels = expression(H[sig]==4%*%sqrt(m[0])))
+		axis(side = 1, at = c(1,2,3,4,5), 
+				label = c('Hmean\nzero cross',
+						'Hs\nspectral','Hs\nzero cross',
+						'H10%\nzero cross',
+						'Hmax\nzero cross'),
+				line = 0, padj = 0.5, tick = FALSE)
+		mtext(side = 1, text = 'Wave height', line = 4, cex = 1.3)
+		legend('bottomright',legend=c('Matlab estimate','R estimate'), 
+				col = c('blue','red'), cex = 1.2, pch = c(19,18), 
+				box.col = mybg, bg = mybg)
+		box()
+		###############
+		# Plot wave period stats
+		par(mar = c(6,5,1,1))
+		plot(x = 0, y = 0,
+				type = 'n',
+				ylim = c(0,max(comparo[c(3,5,6,14,15),2:3])),
+				#			ylim = c(0,2.5),
+				xlim = c(0.5,5.5),
+				xaxt = 'n',
+				las = 1,
+				ylab = 'Wave period, s', xlab = '',
+				cex.lab = 1.3, cex.axis = cexaxis)
+		rect(par()$usr[1],par()$usr[3],par()$usr[2],par()$usr[4],col='grey70')
+		grid(nx = NA, ny=NULL, col = 'white', lty = 2)
+		# Plot spectral T_0_1 estimate
+		points(x = c(0.9,1.1), y = c(comparo[5,2:3]), col = c('blue','red'),
+				pch = c(19,18), cex = cexval)
+		# Plot spectral T_0_2 estimate
+		points(x = c(1.9,2.1),y = c(comparo[6,2:3]), col = c('blue','red'),
+				pch = c(19,18), cex = cexval)
+		# Plot zero-cross mean period T_mean
+		points(x = c(2.9,3.1),y = c(comparo[14,2:3]), col = c('blue','red'),
+				pch = c(19,18), cex = cexval)
+		# Plot zero-cross T_s = period of highest 1/3 of waves
+		points(x = c(3.9,4.1),y = c(comparo[15,2:3]), col = c('blue','red'),
+				pch = c(19,18), cex = cexval)
+		# Plot spectral peak period Tp
+		points(x = c(4.9,5.1),y = c(comparo[3,2:3]), col = c('blue','red'),
+				pch = c(19,18), cex = cexval)
+		axis(side = 1, at = c(1,2,3,4,5), 
+				label = c('APD\nspectral\nm_0/m_1',
+						'APD\nspectral\nsqrt(m0/m2)',
+						'T_mean\nzero cross','T_sig\nzero cross',
+						'T_peak\nspectral'),
+				line = 0, padj = 0.5, tick = FALSE)
+		mtext(side = 1, line = 4, text = 'Wave period', cex = 1.3)
+		legend('bottomright',legend=c('Matlab estimate','R estimate'), 
+				col = c('blue','red'), cex = 1.2, pch = c(19,18),
+				 box.col = mybg, bg = mybg)
+		box()
+	}
+	
+	comparo # Return data frame
+}
+runcomparison(wavedata$SurfaceHeight.m, Fs = 4, plot = TRUE)
+################################################################################
