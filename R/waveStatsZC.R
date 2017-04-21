@@ -42,18 +42,18 @@ waveStatsZC <- function(data, Fs, threshold = NULL, plot = FALSE){
 	
 #% The function was written for zero upward-crossing. 
 #% To have zero downward-crossing (recommended) leave the next line uncommented
-	data=-data
+	data <- -data
 	
 	# detrendHeight function removes a linear trend and should result in a 
 	# zero-mean timeseries
-	data = oceanwaves::detrendHeight(data) 
+	data <- oceanwaves::detrendHeight(data) 
 	
 	# Make a shorter version of data with 0's removed
-	d0 = data[!almostZero(data,0)]	
+	d0 <- data[!almostZero(data,0)]	
 	# Make a vector of indices the same length as 'data'
-	back0 = 1:length(data)
+	back0 <- 1:length(data)
 	# Keep only indices that are non-zero in 'data'
-	back0 = back0[!almostZero(data,0)]
+	back0 <- back0[!almostZero(data,0)]
  		
 	# The code below multiplies each entry in d0 by the next entry in d0
 	# and checks if the resulting value is negative (less than 0).
@@ -64,33 +64,33 @@ waveStatsZC <- function(data, Fs, threshold = NULL, plot = FALSE){
 	# to positive, the result will be a negative number (less than 0), and 
 	# this must represent a crossing of the zero height level. 
 	# The which() function then returns the indices where this is TRUE.
-	f = which(d0[1:(length(d0)-1)] * d0[2:length(d0)] < 0)
+	f <- which(d0[1:(length(d0)-1)] * d0[2:length(d0)] < 0)
 	# Extract the indices in 'data' where the height transitioned across 0
-	crossing = back0[f]
+	crossing <- back0[f]
 	
 	# If the height record started off positive, then the first crossing must
 	# be downward, and we will ignore it.
 	if (data[1] > 0) {
-		crossing = crossing[-1] # Remove the first crossing index
+		crossing <- crossing[-1] # Remove the first crossing index
 	}
 
 	# Subset the crossing vector (containing indices) in steps of 2. The 
 	# first entry should be a zero upward crossing, since we just removed the 
 	# former first entry if it was a downward crossing. Every 2nd entry after 
 	# that should also represent an upward zero crossing event. 
-	crossing = crossing[seq(1,length(crossing), by = 2)]
+	crossing <- crossing[seq(1,length(crossing), by = 2)]
 
 	# Make a 4-column matrix to hold the height, crest, trough, and period data 
 	# for each wave.
-	wave = matrix(NA, nrow = length(crossing)-1, ncol = 4)
+	wave <- matrix(NA, nrow = length(crossing)-1, ncol = 4)
 	
 	for (i in 1:(length(crossing)-1)){
 		# Get the highest surface height for the interval between each 
 		# upward zero crossing
-		wave[i,2] = max(data[crossing[i]:crossing[(i+1)]])
+		wave[i,2] <- max(data[crossing[i]:crossing[(i+1)]])
 		# Get the lowest surface height for the interval between each 
 		# upward zero crossing. This will be made positive for ease of use later
-		wave[i,3] = -min(data[crossing[i]:crossing[(i+1)]])
+		wave[i,3] <- -min(data[crossing[i]:crossing[(i+1)]])
 	}
 
 	# If no wave was found in data, then do nothing. Otherwise, process each
@@ -100,7 +100,7 @@ waveStatsZC <- function(data, Fs, threshold = NULL, plot = FALSE){
 		# the number of rows between each upward crossing and dividing
 		# by the sampling rate (Fs, units of Hz). This will be 
 		# the period for each wave.
-		wave[,4] = diff(crossing)/Fs		
+		wave[,4] <- diff(crossing)/Fs		
   
 		if (is.null(threshold)){
 			# If no minimum threshold for wave height was supplied, calculate a
@@ -114,9 +114,9 @@ waveStatsZC <- function(data, Fs, threshold = NULL, plot = FALSE){
 		
 		# Iterate through the 'wave' matrix and remove waves that are too small
 		# and join them to the prior wave in the series
-		 i = 0
+		 i <- 0
 		 while (i < nrow(wave)){
-			 i = i + 1
+			 i <- i + 1
 			 # First check if the crest of wave i is less than threshold height
 			# If the crest is too small, this will join the wave data with the
 			# previous wave's data
@@ -126,12 +126,12 @@ waveStatsZC <- function(data, Fs, threshold = NULL, plot = FALSE){
 					# with the max crest of wave i-1 or i, and the
 					# max trough of wave i-i or i, and the
 					# duration of wave i-1 and i.
-					 wave[i-1,2:4] = c(max(wave[(i-1):i,2]),
+					 wave[i-1,2:4] <- c(max(wave[(i-1):i,2]),
 							 max(wave[(i-1):i,3]),
 							 sum(wave[(i-1):i,4]))
 				 }
 				 # Remove this row that was less than the threshold
-				 wave = wave[-i,]
+				 wave <- wave[-i,]
 				 
 			# Next check if the trough was smaller than the threshold
 			# If the trough is small, then this will join the wave data with
@@ -142,19 +142,19 @@ waveStatsZC <- function(data, Fs, threshold = NULL, plot = FALSE){
 					 # with the max crest of wave i or i+1, and the
 					 # max trough of wave i or i+1, and the
 					 # duration of wave i and i+1.
-					 wave[i,2:4] = c(max(wave[i:(i+1),2]),
+					 wave[i,2:4] <- c(max(wave[i:(i+1),2]),
 							 max(wave[i:(i+1),3]),
 							 sum(wave[i:(i+1),4]))
 					 # Remove the data for the next wave in the series
-					 wave = wave[-(i+1),]
+					 wave <- wave[-(i+1),]
 				 } else {
-					 wave = wave[-i,]
+					 wave <- wave[-i,]
 				 }
 			 }
 		 }
 		 # Add the crest and trough heights together for each wave to get
 		 # overall wave height
-		 wave[,1] = wave[,2] + wave[,3]
+		 wave[,1] <- wave[,2] + wave[,3]
 		
 	} 	
 					
@@ -162,24 +162,24 @@ waveStatsZC <- function(data, Fs, threshold = NULL, plot = FALSE){
 
 # Calculation of the wave statistics
 	# Get the number of waves available to analyze
-	nb=nrow(wave) 
+	nb <- nrow(wave) 
 	# Sort the wave matrix based on the 1st column (wave height), large to small
-	wave = wave[order(wave[,1], decreasing = TRUE),]
+	wave <- wave[order(wave[,1], decreasing = TRUE),]
 	# Calculate the mean of the highest 1/3 of waves in the data set
-	Hsig = mean(wave[1:round(nb*(1/3)), 1])
+	Hsig <- mean(wave[1:round(nb*(1/3)), 1])
 	# Overall mean wave height, for all waves (bigger than threshold)
-	Hmean = mean(wave[ , 1])
+	Hmean <- mean(wave[ , 1])
 	# Mean height of the upper 10% of all waves
-	H10 = mean(wave[1:round(nb*0.1),1])
+	H10 <- mean(wave[1:round(nb*0.1),1])
 	# Maximum wave height
-	Hmax = max(wave[,1])
+	Hmax <- max(wave[,1])
 	# Mean period
-	Tmean = mean(wave[,4])
+	Tmean <- mean(wave[,4])
 	# Mean period of Hsig (highest 1/3 of waves)
-	Tsig = mean(wave[1:round(nb*(1/3)), 4])
+	Tsig <- mean(wave[1:round(nb*(1/3)), 4])
 	
 	# Assemble a list to return
-	waveStats = list(Hsig = Hsig, Hmean = Hmean, H10 = H10, Hmax = Hmax,
+	waveStats <- list(Hsig = Hsig, Hmean = Hmean, H10 = H10, Hmax = Hmax,
 			Tmean = Tmean, Tsig = Tsig)
 	
 	if (plot){
