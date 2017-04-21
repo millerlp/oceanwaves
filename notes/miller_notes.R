@@ -240,12 +240,12 @@ library(bspec)
 # This function should approximate the old MATLAB spectrum function, which also
 # used Welch's method of windowing data. It is not an exact match for the 
 # wavesp.m MATLAB output, but it's close. 
-wpsd = welchPSD(xt, seglength=225,two.sided=FALSE,method='mean',
+wpsd = welchPSD(xt, seglength=360,two.sided=FALSE,method='mean',
 		windowingPsdCorrection=TRUE)
 # Remove the zero-frequency entry
 wpsd$frequency = wpsd$frequency[-1]
 # Remove the zero-frequency entry from power as well
-wpsd$power = wpsd$power[-1] #  * 2/fsamp # If using two.sided=TRUE, don't multiply by 2/fsamp
+wpsd$power = wpsd$power[-1] 
 
 df = wpsd$frequency[2]-wpsd$frequency[1] # delta-frequency (should be same as values from diff(nyfreqs)
 integmin=min(which(wpsd$frequency >= 0)); # this influences Hm0 and other wave parameters
@@ -257,7 +257,7 @@ for (i in seq(-2,4,by=1)) { # calculation of moments of spectrum
 	# Note that the wpsd$power values are multiplied by 2 to normalize them
 	# in the same fashion as a raw power spectral density estimator
 	moment[i+3]=sum(wpsd$frequency[integmin:integmax]^i*
-					(2*wpsd$power[integmin:integmax]))*df;
+					(wpsd$power[integmin:integmax]))*df;
 }
 m0 = moment[3];
 Hm0 = 4 * sqrt(m0)
@@ -267,16 +267,16 @@ T_pc = moment[-2+3]*moment[1+3]/(moment[0+3]^2) # calculated peak period
 EPS2 = (moment[0+3]*moment[2+3]/moment[1+3]^2-1)^0.5;  # spectral width parameter
 EPS4 = (1 - moment[2+3]^2/(moment[0+3]*moment[4+3]))^0.5;
 Tp = 1/wpsd$frequency[which.max(wpsd$power)] 
-# Calculate variance as the sum of power times 2, divided by number of frequencies 
+# Calculate variance as the sum of power, divided by number of frequencies 
 # times the Nyquist frequency (which is equal to the width of each frequency band)
-welchvar = (2*sum(wpsd$power))/(length(wpsd$frequency))*(fsamp/2)
+welchvar = (sum(wpsd$power))/(length(wpsd$frequency))*(fsamp/2)
 # The variance above will not be exactly the same as the var(xt) of the original
 # full-length time series, since the welch's estimate is based on averaging
 # the spectra from several shorter windows of the original full-length timeseries
 # But it ought to be close
 welchvar/var(xt)
 
-# Plot the smoothed periodogram, being sure to multiply x2 to match raw PSD
+# Plot the smoothed periodogram, from welchPSD
 lines(wpsd$frequency,wpsd$power, col = rgb(1,0,1))
 
 
@@ -575,6 +575,9 @@ ggplot(data = subset(spec.df, freq > 1/(maxPeriod*4) & freq < 1/(minPeriod*4) ))
 matlabwaves <- function(waves, Fs = 4) {
 	library(matlabr)
 	options(matlab.path = "C:\\Program Files (x86)\\MATLAB\\R2013a Student\bin")
+	if (file.exists('D:/R_public/oceanwaves/notes/test.txt')){
+		file.remove('D:/R_public/oceanwaves/notes/test.txt')
+	}
 # Convert surface height timeseries into character vector for MATLAB
 	matwaves = rvec_to_matlab(waves)
 # Generate a script file to call inside MATLAB
@@ -599,7 +602,6 @@ matlabwaves <- function(waves, Fs = 4) {
 					'EPS2','EPS4','H_significant','H_mean','H_10',
 					'H_max','T_mean','T_s'),
 			colClasses = rep('numeric',15))
-	file.remove('D:/R_public/oceanwaves/notes/test.txt')
 	output
 	} else {
 		stop("Could not find test.txt output from MATLAB")
@@ -615,22 +617,23 @@ runcomparison <- function(mywaves, Fs = 4, plot = FALSE){
 # Run the R zero-cross version
 	Rzc = waveStatsZC(mywaves,Fs = Fs)
 # Run the R spectral analysis version
-	Rsp = waveStatsSP(mywaves,Fs = Fs)
+	Rspec.pgram = waveStatsSP(mywaves,Fs = Fs, method = 'spec.pgram')
+# Run the R spectral analysis version
+	Rwelch = waveStatsSP(mywaves,Fs = Fs, method = 'welchPSD', segments = 6)
 # Reformat results for easy comparison
-	comparo = data.frame(Stat = colnames(matwaves), 
-			MATLAB = as.vector(unlist(matwaves[1,])),
-			R = c(as.vector(unlist(Rsp[1,])),as.vector(unlist(Rzc[1:6]))))
+	comparo = data.frame(Stat = colnames(matwaves[-7]), 
+			MATLAB = as.vector(unlist(matwaves[1,-7])),
+			Rspec.pgram = c(as.vector(unlist(Rspec.pgram[1,])),
+					as.vector(unlist(Rzc[1:6]))),
+			Rwelch = c(as.vector(unlist(Rwelch[1,])),
+					as.vector(unlist(Rzc[1:6]))))
 	# Calculate difference between MATLAB results and R results
-	comparo$diff = comparo$MATLAB - comparo$R
-	# Also calculate significant wave height directly using the variance
-	# of the wave time series
-	comparo[16,1] = NA
-	comparo[16,2] = NA # This value isn't calculated by MATLAB function
-	comparo[16,3] = 4 * sqrt(var(mywaves))
-	comparo[16,4] = NA
+	comparo$diffMvRspec = comparo$MATLAB - comparo$Rspec.pgram
+	comparo$diffRspecvWelch = comparo$Rspec.pgram - comparo$Rwelch
+	
 	# Round off all values to a reasonable precision. Any very small differences
 	# between the two methods will show up as 0. 
-	comparo[,2:4] = round(comparo[,2:4],4)
+	comparo[,2:6] = round(comparo[,2:6],4)
 	
 	########## 
 	if (plot) {
@@ -642,7 +645,7 @@ runcomparison <- function(mywaves, Fs = 4, plot = FALSE){
 		mybg = 'grey70'
 		plot(x = 0, y = 0,
 				type = 'n',
-				ylim = c(0,max(comparo[c(2,10:13),2:3])),
+				ylim = c(0,max(comparo[c(2,9:12),2:4])),
 #			ylim = c(0,2.5),
 				xlim = c(0.5,5.5),
 				xaxt = 'n',
@@ -652,19 +655,19 @@ runcomparison <- function(mywaves, Fs = 4, plot = FALSE){
 		rect(par()$usr[1],par()$usr[3],par()$usr[2],par()$usr[4],col=mybg)
 		grid(nx = NA, ny=NULL, col = 'white', lty = 2)
 		# Plot zero-cross Hmean
-		points(x = c(0.9,1.1), y = c(comparo[11,2:3]), col = c('blue','red'),
+		points(x = c(0.9,1.1), y = c(comparo[10,2:3]), col = c('blue','red'),
 				pch = c(19,18), cex = cexval)
-		# Plot spectral Hsig estimate
-		points(x = c(1.9,2.1),y = c(comparo[2,2:3]), col = c('blue','red'),
-				pch = c(19,18), cex = cexval)
+		# Plot spectral Hsig estimate (Hm0)
+		points(x = c(1.9,2.1,2.2),y = c(comparo[2,2:4]), col = c('blue','red','green'),
+				pch = c(19,18,18), cex = cexval)
 		# Plot zero-cross Hsig estimate
-		points(x = c(2.9,3.1),y = c(comparo[10,2:3]), col = c('blue','red'),
+		points(x = c(2.9,3.1),y = c(comparo[9,2:3]), col = c('blue','red'),
 				pch = c(19,18), cex = cexval)
 		# Plot zero-cross H10 = average height of highest 10% of waves
-		points(x = c(3.9,4.1),y = c(comparo[12,2:3]), col = c('blue','red'),
+		points(x = c(3.9,4.1),y = c(comparo[11,2:3]), col = c('blue','red'),
 				pch = c(19,18), cex = cexval)
 		# Plot zero-cross Hmax = highest overall wave
-		points(x = c(4.9,5.1),y = c(comparo[13,2:3]), col = c('blue','red'),
+		points(x = c(4.9,5.1),y = c(comparo[12,2:3]), col = c('blue','red'),
 				pch = c(19,18), cex = cexval)
 		# Plot point representing the Hsig calculated using timeseries variance
 		points(x = 3.5, y = 4 * sqrt(var(mywaves)), pch = 20, col = 'black',
@@ -678,16 +681,16 @@ runcomparison <- function(mywaves, Fs = 4, plot = FALSE){
 						'Hmax\nzero cross'),
 				line = 0, padj = 0.5, tick = FALSE)
 		mtext(side = 1, text = 'Wave height', line = 4, cex = 1.3)
-		legend('bottomright',legend=c('Matlab estimate','R estimate'), 
-				col = c('blue','red'), cex = 1.2, pch = c(19,18), 
+		legend('bottomright',legend=c('Matlab estimate','R spec.pgram','R welchPSD'), 
+				col = c('blue','red','green'), cex = 1.2, pch = c(19,18,18), 
 				box.col = mybg, bg = mybg)
 		box()
-		###############
+		############################################
 		# Plot wave period stats
 		par(mar = c(6,5,1,1))
 		plot(x = 0, y = 0,
 				type = 'n',
-				ylim = c(0,max(comparo[c(3,5,6,14,15),2:3])),
+				ylim = c(0,max(comparo[c(3,5,6,13,14),2:4])),
 				#			ylim = c(0,2.5),
 				xlim = c(0.5,5.5),
 				xaxt = 'n',
@@ -697,20 +700,20 @@ runcomparison <- function(mywaves, Fs = 4, plot = FALSE){
 		rect(par()$usr[1],par()$usr[3],par()$usr[2],par()$usr[4],col='grey70')
 		grid(nx = NA, ny=NULL, col = 'white', lty = 2)
 		# Plot spectral T_0_1 estimate
-		points(x = c(0.9,1.1), y = c(comparo[5,2:3]), col = c('blue','red'),
-				pch = c(19,18), cex = cexval)
+		points(x = c(0.9,1.1,1.2), y = c(comparo[5,2:4]), col = c('blue','red','green'),
+				pch = c(19,18,18), cex = cexval)
 		# Plot spectral T_0_2 estimate
-		points(x = c(1.9,2.1),y = c(comparo[6,2:3]), col = c('blue','red'),
-				pch = c(19,18), cex = cexval)
+		points(x = c(1.9,2.1,2.2),y = c(comparo[6,2:4]), col = c('blue','red','green'),
+				pch = c(19,18,18), cex = cexval)
 		# Plot zero-cross mean period T_mean
-		points(x = c(2.9,3.1),y = c(comparo[14,2:3]), col = c('blue','red'),
+		points(x = c(2.9,3.1),y = c(comparo[13,2:3]), col = c('blue','red'),
 				pch = c(19,18), cex = cexval)
 		# Plot zero-cross T_s = period of highest 1/3 of waves
-		points(x = c(3.9,4.1),y = c(comparo[15,2:3]), col = c('blue','red'),
+		points(x = c(3.9,4.1),y = c(comparo[14,2:3]), col = c('blue','red'),
 				pch = c(19,18), cex = cexval)
 		# Plot spectral peak period Tp
-		points(x = c(4.9,5.1),y = c(comparo[3,2:3]), col = c('blue','red'),
-				pch = c(19,18), cex = cexval)
+		points(x = c(4.9,5.1,5.2),y = c(comparo[3,2:4]), col = c('blue','red','green'),
+				pch = c(19,18,18), cex = cexval)
 		axis(side = 1, at = c(1,2,3,4,5), 
 				label = c('APD\nspectral\nm_0/m_1',
 						'APD\nspectral\nsqrt(m0/m2)',
@@ -718,15 +721,15 @@ runcomparison <- function(mywaves, Fs = 4, plot = FALSE){
 						'T_peak\nspectral'),
 				line = 0, padj = 0.5, tick = FALSE)
 		mtext(side = 1, line = 4, text = 'Wave period', cex = 1.3)
-		legend('bottomright',legend=c('Matlab estimate','R estimate'), 
-				col = c('blue','red'), cex = 1.2, pch = c(19,18),
+		legend('bottomright',legend=c('Matlab estimate','R spec.pgram','R welchPSD'), 
+				col = c('blue','red','green'), cex = 1.2, pch = c(19,18,18),
 				 box.col = mybg, bg = mybg)
 		box()
 	}
 	
 	comparo # Return data frame
 }
-#runcomparison(wavedata$SurfaceHeight.m, Fs = 4, plot = TRUE)
+runcomparison(wavedata$SurfaceHeight.m, Fs = 4, plot = TRUE)
 ################################################################################
 # load Rdata file containing a data frame 'dat' with processed surface height
 # time series from the Elsmore deployment 201610. 
@@ -734,4 +737,5 @@ load('D:/Dropbox/OWHL_misc/Deployment_Elsmore_201610.rda')
 t1 = 1
 # Go through chunks of data and compare MATLAB vs R wave stats results
 runcomparison(dat$swDepthcorr.m[t1:(t1+3600)], Fs = 4, plot = TRUE);t1 = t1+3600
+
 

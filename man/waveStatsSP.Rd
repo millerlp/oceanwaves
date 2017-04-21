@@ -4,7 +4,7 @@
 \alias{waveStatsSP}
 \title{Calculate ocean wave parameters using spectral analysis}
 \usage{
-waveStatsSP(PT, Fs)
+waveStatsSP(PT, Fs, method = c("welchPSD", "spec.pgram"), kernel = NULL)
 }
 \arguments{
 \item{PT}{A vector of surface heights that constitute a time series of 
@@ -12,6 +12,9 @@ observations. Units = meters}
 
 \item{Fs}{Sampling frequency of the surface heights data. Units = Hz, i.e.
 samples per second.}
+
+\item{method}{A character string indicating which spectral analysis method
+should be used. Choose one of "welchPSD" (default) or "spec.pgram".}
 }
 \value{
 Data frame of wave parameters based on spectral methods
