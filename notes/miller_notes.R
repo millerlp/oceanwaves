@@ -1,3 +1,7 @@
+# TODO: implement windowed Welch's method-type spectral analysis
+# TODO: fancy up the detrendHeight function to also return h (mean depth) and 
+# coefficients so that I can eliminate the redundant code in prCorr.R
+###########################################################################
 setwd("D:/R_public/oceanwaves") # package must be the working directory
 setwd("~/R_public/oceanwaves") # package must be the working directory
 library(devtools)  # load devtools
@@ -572,21 +576,34 @@ matlabwaves <- function(waves, Fs = 4) {
 	library(matlabr)
 	options(matlab.path = "C:\\Program Files (x86)\\MATLAB\\R2013a Student\bin")
 # Convert surface height timeseries into character vector for MATLAB
-	waves = rvec_to_matlab(wavedata$SurfaceHeight.m)
+	matwaves = rvec_to_matlab(waves)
 # Generate a script file to call inside MATLAB
 	code = c("cd('D:/MATLAB/work/waves');",
-			paste0("PT = ",waves), 
+			paste0("PT = ",matwaves), 
 			paste0("[res,names]=wavesp(PT,[],",Fs,",'az');"), 
 			"cd('D:/R_public/oceanwaves/notes');",
 			"save('test.txt', 'res', '-ascii','-tabs')")
-	res = run_matlab_code(code, verbose=FALSE) # Run the code in MATLAB
+	res = run_matlab_code(code, verbose=FALSE, wait = TRUE) # Run the code in MATLAB
+	# Check that output file has been produced, pause otherwise
+	watchdog = 1 
+	while(!file.exists('D:/R_public/oceanwaves/notes/test.txt')){
+		Sys.sleep(1)
+		watchdog = watchdog + 1
+		if (watchdog > 5) {cat('test.txt not found\n'); break}
+	}
+	if (file.exists('D:/R_public/oceanwaves/notes/test.txt')){
 # Read in the output file produced by wavesp function in MATLAB
-	output = read.table(file = './notes/test.txt',sep = '\t',
+	output = read.table(file = 'D:/R_public/oceanwaves/notes/test.txt',
+			sep = '\t',
 			col.names=c( 'h','Hm0','Tp','m0','T_0_1','T_0_2','T_pc',
 					'EPS2','EPS4','H_significant','H_mean','H_10',
 					'H_max','T_mean','T_s'),
 			colClasses = rep('numeric',15))
+	file.remove('D:/R_public/oceanwaves/notes/test.txt')
 	output
+	} else {
+		stop("Could not find test.txt output from MATLAB")
+	}
 }
 ################################################################################
 mywaves = wavedata$SurfaceHeight.m
@@ -709,5 +726,12 @@ runcomparison <- function(mywaves, Fs = 4, plot = FALSE){
 	
 	comparo # Return data frame
 }
-runcomparison(wavedata$SurfaceHeight.m, Fs = 4, plot = TRUE)
+#runcomparison(wavedata$SurfaceHeight.m, Fs = 4, plot = TRUE)
 ################################################################################
+# load Rdata file containing a data frame 'dat' with processed surface height
+# time series from the Elsmore deployment 201610. 
+load('D:/Dropbox/OWHL_misc/Deployment_Elsmore_201610.rda')
+t1 = 1
+# Go through chunks of data and compare MATLAB vs R wave stats results
+runcomparison(dat$swDepthcorr.m[t1:(t1+3600)], Fs = 4, plot = TRUE);t1 = t1+3600
+
