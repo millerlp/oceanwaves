@@ -22,8 +22,11 @@ periods are desired.}
 A list object containing summary statistic values.
 }
 \description{
-A function to calculate ocean wave summary statistics, including significant
-wave height and period, based on an upward zero-crossing algorithm originally
+Calculate ocean wave summary statistics, including significant
+wave height and period.
+}
+\details{
+Based on an upward zero-crossing algorithm originally
 provided by Urs Neumeier, v1.06.
 }
 \examples{

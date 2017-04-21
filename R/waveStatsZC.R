@@ -6,11 +6,13 @@
 # Author: Luke Miller  Mar 22, 2017
 ###############################################################################
 
-#' Calculate wave statistics using zero-cross method
+#' Calculate wave statistics using zero-crossing method
 #' 
-#' A function to calculate ocean wave summary statistics, including significant
-#' wave height and period, based on an upward zero-crossing algorithm originally
-#' provided by Urs Neumeier, v1.06.
+#' Calculate ocean wave summary statistics, including significant
+#' wave height and period. 
+#' 
+#' Based on an upward zero-crossing algorithm originally
+#' provided by Urs Neumeier, v1.06. 
 #' 
 #' @param data A numeric vector of water surface height data. The data do not
 #' need to be detrended prior to use.
@@ -19,7 +21,9 @@
 #' be considered a wave. 
 #' @param plot Set to TRUE if summary histograms of wave heights and wave
 #' periods are desired.
-#' @return A list object containing summary statistic values. 
+#' @return A list object containing summary statistic values. Includes
+#' significant wave height, mean wave height, 1/10th wave height, maximum wave
+#' height, mean wave period, significant period.
 #' @references Original MATLAB function by Urs Neumeier:  
 #' http://neumeier.perso.ch/matlab/waves.html
 #' @examples

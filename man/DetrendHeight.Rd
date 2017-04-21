@@ -15,9 +15,12 @@ A vector of detrended values
 \description{
 Fits a straight line to a vector of values using lm(), and uses the
 regression coefficients to subtract off the linear trend from the values.
-Returns a series of residuals around the linear trend.
+}
+\details{
 Typically this is used to remove a tidal trend from a ocean 
 surface height time series before attempting to calculate statistics for 
-waves, which are variations above and below the mean surface height.
+waves, which are variations above and below the mean surface height. 
+Returns a series of residuals around the linear trend, in the original units
+of measurement (typically meters).
 }
 
