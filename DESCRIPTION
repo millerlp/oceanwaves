@@ -12,7 +12,8 @@ Depends:
     R (>= 3.3.0)
 Imports:
     oce,
-    signal
+    signal,
+    bspec
 Suggests:
     ggplot2,
     scales,
