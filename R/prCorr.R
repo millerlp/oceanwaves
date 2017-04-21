@@ -36,23 +36,25 @@
 #' legend('topleft',legend=c('Corrected','Raw'),col=c('black','red'),lwd = 2)
 
 prCorr <- function(pt, Fs, zpt, M = 512, CorrLim = c(0.05, 0.33) ){
-	# library(signal) # for hanning() function
 	
-	# normally the maximum attenuation correction should not be higher than 5
+	# Normally the maximum attenuation correction should not be higher than 5
 	max_attenuation_correction <- 5
 	# % higher value to process boat-waves for Jean Ellis
 	# % max_attenuation_correction <- 20; 
 	
-	# mininum frequency, below which no correction is applied (0.05) = 20 s period
+	# Minimum frequency, below which no correction is applied 
+	# (0.05) = 20 s period
 	min_frequency <- CorrLim[1]
-	# maximum frequency, above which no correction is applied (0.33) = 3 s period
+	# Maximum frequency, above which no correction is applied 
+	# (0.33) = 3 s period
 	max_frequency <- CorrLim[2]
+	# Make a copy of the input depth values
+	H_with_NaN <- pt	
+	# Get the indices of good data (not NA)
+	notNA <- which(!is.nan(pt))
+	# Make a reduced copy with only the good rows of pt
+	pt<-pt[notNA] 
 	
-	H_with_NaN <- pt	# make a copy of the input depth values
-	notNA <- which(!is.nan(pt)) # get the indices of good data (not NA)
-	pt<-pt[notNA] # make a reduced copy with only the good rows of pt
-	
-	# do_detrend=isempty(h); # little h is the mean water depth. MATLAB version
 	do_detrend <- TRUE # Need to insert code to check for presence of  
 	# an argument 'h', h and skip the detrending if it
 	# was provided. LPM note: h is not currently an argument
