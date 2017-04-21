@@ -33,20 +33,24 @@
 #' with spec.pgram method. 
 #' @param segments Numeric value indicating the number of windowing segments to
 #' use with welchPSD method.
+#' @param plot A logical value denoting whether to plot the spectrum. Defaults 
+#' to FALSE. 
 #' @param ... Additional arguments to be passed to spectral analysis functions, 
 #' such as windowfun
 #' @return Data frame of wave parameters based on spectral methods
+#' @references Original MATLAB function by Urs Neumeier:  
+#' http://neumeier.perso.ch/matlab/waves.html
 
 waveStatsSP <- function(PT, Fs, method = c('welchPSD','spec.pgram'), 
-		kernel = NULL, segments = NULL, ...){
+		 plot = FALSE,kernel = NULL, segments = NULL, ...){
 	# Inputs
 	# PT = vector of pressure transducer values, converted to seawater height
 	#		(height of sea surface above pressure transducer, units = meters)
 	# 
-	method = match.arg(method, choices = c('welchPSD','spec.pgram'))
+	method <- match.arg(method, choices = c('welchPSD','spec.pgram'))
 	
-	min_frequency = 0.05;	#	% mininum frequency, below which no correction is applied (0.05)
-	max_frequency = 0.33;		#% maximum frequency, above which no correction is applied (0.33)	
+	min_frequency <- 0.05;	#	% mininum frequency, below which no correction is applied (0.05)
+	max_frequency <- 0.33;		#% maximum frequency, above which no correction is applied (0.33)	
 	
 	#
 	# Prepare data for spectral analysis
@@ -64,55 +68,55 @@ waveStatsSP <- function(PT, Fs, method = c('welchPSD','spec.pgram'),
 	PT <- oceanwaves::detrendHeight(PT); 
 
 	# Convert timeseries of surface heights to a timeseries object
-	xt = ts(PT, frequency = Fs)
+	xt <- ts(PT, frequency = Fs)
 	
 	if (method == 'spec.pgram'){
 		if (is.null(kernel)){
-			kernelval = kernel('daniell',c(9,9,9)) # Set default
+			kernelval <- kernel('daniell',c(9,9,9)) # Set default
 		} else if (class(kernel) == 'tskernel') {
-			kernelval = kernel # Use the user's kernel values
+			kernelval <- kernel # Use the user's kernel values
 		} else {
 			stop("Kernel for spec.pgram must be of class 'tskernel'")
 		}
 		# Use spec.pgram to estimate power spectral density, with smoothers
 		pgram <- spec.pgram(xt, kernel = kernelval, taper=0.1, plot=FALSE)
-		pgramm0 = (Fs*mean(pgram$spec))
-		deltaf = pgram$freq[2]-pgram$freq[1] # bandwidth (Hz)
-		integmin=min(which(pgram$freq >= 0)); # this influences Hm0 and other wave parameters
-		integmax=max(which(pgram$freq <= max_frequency*1.5 ));
-		moment = vector(length = 7)
+		pgramm0 <- (Fs*mean(pgram$spec))
+		deltaf <- pgram$freq[2]-pgram$freq[1] # bandwidth (Hz)
+		integmin <- min(which(pgram$freq >= 0)); # this influences Hm0 and other wave parameters
+		integmax <- max(which(pgram$freq <= max_frequency*1.5 ));
+		moment <- vector(length = 7)
 		# Calculate moments of the spectrum, from -2nd to 0th to 4th
 		# For a spectrum, the 0th moment represents the variance of the data, and
 		# should be close to the value produced by simply using var(PT)
 		for (i in seq(-2,4,by=1)) { # calculation of moments of spectrum
 			# Note that the pgram$spec values are multiplied by 2 to normalize them
 			# in the same fashion as a raw power spectral density estimator
-			moment[i+3]=sum(pgram$freq[integmin:integmax]^i*
-							(2*pgram$spec[integmin:integmax]))*deltaf;
+			moment[i+3] <- sum(pgram$freq[integmin:integmax]^i*
+							(2 * pgram$spec[integmin:integmax])) * deltaf;
 		}	
 		# Peak period, calculated from Frequency at maximum of spectrum 
-		Tp = 1/pgram$freq[which.max(pgram$spec)] # units seconds
+		Tp <- 1/pgram$freq[which.max(pgram$spec)] # units seconds
 	} else if (method == 'welchPSD'){
 		if (is.null(segments)){
 			# Set default segment length for windowing
-			Noseg = 4
+			Noseg <- 4
 		} else {
-			Noseg = segments
+			Noseg <- segments
 		} 
-		M = 2 * (length(mywaves)/ (Noseg+1)) / Fs
-		seglength =  M
+		M <- 2 * (length(mywaves)/ (Noseg+1)) / Fs
+		seglength <-  M
 		
-		wpsd = welchPSD(xt, seglength = M,two.sided = FALSE,method='mean',
-				windowingPsdCorrection=TRUE)
+		wpsd = welchPSD(xt, seglength = M, two.sided = FALSE, method = 'mean',
+				windowingPsdCorrection = TRUE, ...)
 		# Remove the zero-frequency entry
-		wpsd$frequency = wpsd$frequency[-1]
+		wpsd$frequency <- wpsd$frequency[-1]
 		# Remove the zero-frequency entry from power as well
-		wpsd$power = wpsd$power[-1] 
+		wpsd$power <- wpsd$power[-1] 
 		
-		deltaf = wpsd$frequency[2]-wpsd$frequency[1] # delta-frequency
-		integmin=min(which(wpsd$frequency >= 0)); # this influences Hm0 and other wave parameters
-		integmax=max(which(wpsd$frequency <= max_frequency*1.5 ));
-		moment = vector(length = 7)
+		deltaf <- wpsd$frequency[2]-wpsd$frequency[1] # delta-frequency
+		integmin <- min(which(wpsd$frequency >= 0)); # this influences Hm0 and other wave parameters
+		integmax <- max(which(wpsd$frequency <= max_frequency*1.5 ));
+		moment <- vector(length = 7)
 		# Calculate moments of the spectrum, from -2nd to 0th to 4th
 		# For a spectrum, the 0th moment represents the variance of the data, and
 		# should be close to the value produced by simply using var(PT)
@@ -123,30 +127,39 @@ waveStatsSP <- function(PT, Fs, method = c('welchPSD','spec.pgram'),
 							(wpsd$power[integmin:integmax]))*deltaf;
 		}
 		# Peak period, calculated from Frequency at maximum of spectrum 
-		Tp = 1/wpsd$frequency[which.max(wpsd$power)]  # units seconds
+		Tp <- 1/wpsd$frequency[which.max(wpsd$power)]  # units seconds
 	}
 	
 	# Estimate variance of time series (moment 0)
-	m0 = moment[3]; 
+	m0 <- moment[3]; 
 	# Estimate significant wave height based on spectral moment 0, units meters
 	# This value is approximately equal to the average of the highest one-third
 	# of waves in the time series.  
-	Hm0 = 4 * sqrt(m0) 
+	Hm0 <- 4 * sqrt(m0) 
 	# T_0_1, average period m0/m1, units seconds. Follows National Data Buoy
 	# Center's method for average period (APD)
-	T_0_1 = moment[3]/moment[1+3] 
+	T_0_1 <- moment[3]/moment[1+3] 
 	# T_0_2, average period (m0/m2)^0.5, units seconds. Follows Scripp's 
 	# Institute of Oceanography's method for calculating average period (APD)
 	# for their buoys. 
-	T_0_2 = (moment[0+3]/moment[2+3])^0.5
+	T_0_2 <- (moment[0+3]/moment[2+3])^0.5
 
 	# spectral width parameters
-	EPS2 = (moment[0+3]*moment[2+3]/moment[1+3]^2-1)^0.5;  
-	EPS4 = (1 - moment[2+3]^2/(moment[0+3]*moment[4+3]))^0.5;
+	EPS2 <- (moment[0+3]*moment[2+3]/moment[1+3]^2-1)^0.5;  
+	EPS4 <- (1 - moment[2+3]^2/(moment[0+3]*moment[4+3]))^0.5;
 
-    
-	results = data.frame(h = h, Hm0 = Hm0, Tp = Tp, m0 = m0, T_0_1 = T_0_1,
+	results <- data.frame(h = h, Hm0 = Hm0, Tp = Tp, m0 = m0, T_0_1 = T_0_1,
 			T_0_2 = T_0_2, EPS2 = EPS2, EPS4 = EPS4)
+	
+	if (plot){
+		if (method == 'welchPSD'){
+			freqspec <- data.frame(freq = wpsd$frequency, spec = wpsd$power)	
+		} else if (method == 'spec.pgram'){
+			# Multiply pgram spectrum by 2 to normalize
+			freqspec <- data.frame(freq = pgram$freq, spec = 2*pgram$spec)
+		}
+		plotWaveSpectrum(freqspec, Fs)
+	}
 		
 	results # Return data frame
 }
