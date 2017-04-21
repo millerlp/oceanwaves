@@ -2,7 +2,7 @@
 % Please edit documentation in R/waveStatsZC.R
 \name{waveStatsZC}
 \alias{waveStatsZC}
-\title{Calculate wave statistics using zero-cross method}
+\title{Calculate wave statistics using zero-crossing method}
 \usage{
 waveStatsZC(data, Fs, threshold = NULL, plot = FALSE)
 }
@@ -19,7 +19,9 @@ be considered a wave.}
 periods are desired.}
 }
 \value{
-A list object containing summary statistic values.
+A list object containing summary statistic values. Includes
+significant wave height, mean wave height, 1/10th wave height, maximum wave
+height, mean wave period, significant period.
 }
 \description{
 Calculate ocean wave summary statistics, including significant
