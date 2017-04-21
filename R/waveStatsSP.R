@@ -1,4 +1,4 @@
-# Filename: wavesp.R
+# Filename: waveStatsSP.R
 # 
 # Author: Luke Miller  2017-04-20, 2017
 ###############################################################################
@@ -6,8 +6,7 @@
 
 ###############################################################################
 ###############################################################################
-## Function: wavesp 
-## **********CURRENTLY NONFUNCTIONAL + UNTESTED****************
+## Function: waveStatsSP 
 
 ## Spectral wave parameters from pressure transducer data (PT) after 
 ## correction of the pressure attenuation (see function pr_corr)
@@ -16,7 +15,13 @@
 ## % written by Urs Neumeier, 2003
 ## % modified from Coast07.m written by T Mason, UPCE, 1999 (psd modified 7/99)
 
-#' Calculate wave parameters using spectral analysis
+#' Calculate ocean wave parameters using spectral analysis
+#' 
+#' Calculate ocean wave parameters using spectral analysis
+#' 
+#' Carries out spectral analysis of ocean wave height time series to estimate
+#' common wave height statistics, including peak period, average period, 
+#' and significant wave height.
 #' 
 #' @param PT A vector of surface heights that constitute a time series of 
 #' observations. Units = meters
@@ -24,7 +29,7 @@
 #' samples per second.
 #' @return Data frame of wave parameters based on spectral methods
 
-wavesp <- function(PT, Fs){
+waveStatsSP <- function(PT, Fs){
 	# Inputs
 	# PT = vector of pressure transducer values, converted to seawater height
 	#		(height of sea surface above pressure transducer, units = meters)
@@ -33,20 +38,25 @@ wavesp <- function(PT, Fs){
 	min_frequency = 0.05;	#	% mininum frequency, below which no correction is applied (0.05)
 	max_frequency = 0.33;		#% maximum frequency, above which no correction is applied (0.33)	
 	
-	#%*************************************************************
-	#		% Prepare data for spectral analysis
+	#
+	# Prepare data for spectral analysis
 	
 	m <- length(PT);		# Get length of surface height record
+	####################
+	# TODO: implement windowing method, such as Welch's method. 
 	# matlab fix() function rounds toward zero, R trunc() function 
 	# should substitute
 #	M = fix(m/Noseg/2)*2;	#% length of segment
 #	M <- trunc(m/Noseg/2)*2;	#% length of segment
+	#####################
 	h <- mean(PT);			#% mean water depth
-	PT <- oceanwaves::DetrendHeight(PT); # Call oceanwaves::DetrendHeight() 
-	# function that computes the least-squares fit of a straight line to 
+	
+	# Call oceanwaves::detrendHeight() 
+	# Function that computes the least-squares fit of a straight line to 
 	# the data and subtracts the resulting function from the data. The resulting
 	# values represent deviations of surface height from the mean surface 
 	# height in the time series.
+	PT <- oceanwaves::detrendHeight(PT); 
 	
 	
 	# Use spec.pgram to estimate power spectral density, with smoothers
@@ -69,26 +79,31 @@ wavesp <- function(PT, Fs){
 		moment[i+3]=sum(pgram$freq[integmin:integmax]^i*
 						(2*pgram$spec[integmin:integmax]))*df;
 	}	
-	m0 = moment[3]; # Estimate variance of timeseries (moment 0)
-	Hm0 = 4 * sqrt(m0) # Estimate sig. wave height based on spectral moment 0, units meters
-	T_0_1 = moment[3]/moment[1+3] # average period m0/m1, units seconds
-	T_0_2 = (moment[0+3]/moment[2+3])^0.5 # average period (m0/m2)^0.5, units seconds
-	T_pc = moment[-2+3]*moment[1+3]/(moment[0+3]^2) # calculated peak period, units seconds
-	EPS2 = (moment[0+3]*moment[2+3]/moment[1+3]^2-1)^0.5;  # spectral width parameter
+	# Estimate variance of time series (moment 0)
+	m0 = moment[3]; 
+	# Estimate significant wave height based on spectral moment 0, units meters
+	# This value is approximately equal to the average of the highest one-third
+	# of waves in the time series.  
+	Hm0 = 4 * sqrt(m0) 
+	# T_0_1, average period m0/m1, units seconds. Follows National Data Buoy
+	# Center's method for average period (APD)
+	T_0_1 = moment[3]/moment[1+3] 
+	# T_0_2, average period (m0/m2)^0.5, units seconds. Follows Scripp's 
+	# Institute of Oceanography's method for calculating average period (APD)
+	# for their buoys. 
+	T_0_2 = (moment[0+3]/moment[2+3])^0.5
+	# Calculated peak period, units seconds. This method appears unreliable
+	# for the R spectrum and should not be trusted
+#	T_pc = moment[-2+3]*moment[1+3]/(moment[0+3]^2)
+	T_pc = NA
+	# spectral width parameters
+	EPS2 = (moment[0+3]*moment[2+3]/moment[1+3]^2-1)^0.5;  
 	EPS4 = (1 - moment[2+3]^2/(moment[0+3]*moment[4+3]))^0.5;
 	# Peak period, calculated from Frequency at maximum of spectrum 
 	Tp = 1/pgram$freq[which.max(pgram$spec)] # units seconds
     
 	results = data.frame(h = h, Hm0 = Hm0, Tp = Tp, m0 = m0, T_0_1 = T_0_1,
 			T_0_2 = T_0_2, T_pc = T_pc, EPS2 = EPS2, EPS4 = EPS4)
-
-	# Original wavesp.m call to spectrum() function in MATLAB, for reference
-#	[P,F] <- spectrum(PT,M,M/2,[],Fs);  # % gives spectrum from 0 to Fnyq
-	# The above in MATLAB feeds an empty vector [] to the window argument,
-	# which results in the spectrum() function using hanning(M) to generate
-	# the hanning window. But the hanning() function in MATLAB does not 
-	# included the zero-weighted samples at the start and end of the output
-	# window, while the hann() function does. 
 		
 	results # Return data frame
 }
