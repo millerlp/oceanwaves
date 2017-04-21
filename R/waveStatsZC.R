@@ -44,7 +44,9 @@ waveStatsZC <- function(data, Fs, threshold = NULL, plot = FALSE){
 #% To have zero downward-crossing (recommended) leave the next line uncommented
 	data=-data
 	
-	data = detrend(data) # detrend function is defined elsewhere
+	# detrendHeight function removes a linear trend and should result in a 
+	# zero-mean timeseries
+	data = oceanwaves::detrendHeight(data) 
 	
 	# Make a shorter version of data with 0's removed
 	d0 = data[!almostZero(data,0)]	
