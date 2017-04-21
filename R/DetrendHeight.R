@@ -7,13 +7,16 @@
 #' 
 #' Fits a straight line to a vector of values using lm(), and uses the
 #' regression coefficients to subtract off the linear trend from the values.
-#' Returns a series of residuals around the linear trend.
+#' 
 #' Typically this is used to remove a tidal trend from a ocean 
 #' surface height time series before attempting to calculate statistics for 
 #' waves, which are variations above and below the mean surface height. 
+#' Returns a series of residuals around the linear trend, in the original units
+#' of measurement (typically meters). 
+
 #' 
 #' @param pt A vector of numeric values to be detrended
-#' @return A vector of detrended values
+#' @return A vector of detrended values, with mean approximately equal to zero.
 
 DetrendHeight <- function(pt){
 	# Determine length of pt
