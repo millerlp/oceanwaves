@@ -1,4 +1,4 @@
-# Filename: DetrendHeight.R
+# Filename: detrendHeight.R
 # 
 # Author: Luke Miller  Mar 22, 2017
 ###############################################################################
@@ -18,7 +18,7 @@
 #' @param pt A vector of numeric values to be detrended
 #' @return A vector of detrended values, with mean approximately equal to zero.
 
-DetrendHeight <- function(pt){
+detrendHeight <- function(pt){
 	# Determine length of pt
 	seg_len <- length(pt)
 	# Make a sequence of indices
