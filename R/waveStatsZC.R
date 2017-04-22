@@ -46,7 +46,8 @@ waveStatsZC <- function(data, Fs, threshold = NULL, plot = FALSE){
 	
 	# detrendHeight function removes a linear trend and should result in a 
 	# zero-mean timeseries
-	data <- oceanwaves::detrendHeight(data) 
+	detrended <- oceanwaves::detrendHeight(data) 
+	data = detrended[['pt']][] # extract vector of detrended heights 
 	
 	# Make a shorter version of data with 0's removed
 	d0 <- data[!almostZero(data,0)]	
@@ -184,8 +185,8 @@ waveStatsZC <- function(data, Fs, threshold = NULL, plot = FALSE){
 	
 	if (plot){
 		par(mfrow = c(2,1))
-		hist(wave[,1], xlab = 'Wave height', main = '')
-		hist(wave[,4], xlab = 'Wave Period', main = '')
+		hist(wave[,1], xlab = 'Wave height, m', main = '')
+		hist(wave[,4], xlab = 'Wave Period, s', main = '')
 		
 	}
 
