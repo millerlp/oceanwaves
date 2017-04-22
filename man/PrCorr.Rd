@@ -5,7 +5,7 @@
 \title{Correct for depth attenuation of a water surface height 
 pressure signal.}
 \usage{
-prCorr(pt, Fs, zpt, M = 512, CorrLim = c(0.05, 0.33))
+prCorr(pt, Fs, zpt, M = 512, CorrLim = c(0.05, 0.33), plot = FALSE)
 }
 \arguments{
 \item{pt}{A vector of water surface heights (units of meters usually).}
@@ -35,7 +35,7 @@ depth of the water column and height of the sensor above the bottom.
 }
 \examples{
 data(wavedata)
-corrected = PrCorr(wavedata$SurfaceHeightRaw.m, Fs = 4, zpt = 0.1)
+corrected = prCorr(wavedata$SurfaceHeightRaw.m, Fs = 4, zpt = 0.1)
 # Plot the results
 plot(x = wavedata$DateTime, y = corrected, type = 'l', 
  ylab='Surface Height, m', xlab = 'Time')
@@ -46,8 +46,5 @@ legend('topleft',legend=c('Corrected','Raw'),col=c('black','red'),lwd = 2)
 Original MATLAB function by Urs Neumeier 
 http://neumeier.perso.ch/matlab/waves.html Modified from the Pcorr3.m 
 function written by T. Mason, SOC, January 1997
-
-Each segment of pt will be linearly detrended, corrected for attenuation,
-and the linear trend will be added back to the returned data.
 }
 

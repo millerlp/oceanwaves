@@ -4,10 +4,11 @@
 \alias{plotWaveSpectrum}
 \title{Plot a basic smoothed spectrum}
 \usage{
-plotWaveSpectrum(PT, Fs)
+plotWaveSpectrum(freqspec, Fs)
 }
 \arguments{
-\item{PT}{A vector of surface heights}
+\item{freqspec}{A data frame containing a column of frequencies and a
+column of spectral power values}
 
 \item{Fs}{Frequency of sampled surface heights, units of Hz}
 }

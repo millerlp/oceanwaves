@@ -2,9 +2,10 @@
 % Please edit documentation in R/waveStatsSP.R
 \name{waveStatsSP}
 \alias{waveStatsSP}
-\title{Calculate ocean wave parameters using spectral analysis}
+\title{Calculate ocean wave parameters using spectral analysis methods}
 \usage{
-waveStatsSP(PT, Fs, method = c("welchPSD", "spec.pgram"), kernel = NULL)
+waveStatsSP(PT, Fs, method = c("welchPSD", "spec.pgram"), plot = FALSE,
+  kernel = NULL, segments = NULL, ...)
 }
 \arguments{
 \item{PT}{A vector of surface heights that constitute a time series of 
@@ -15,16 +16,36 @@ samples per second.}
 
 \item{method}{A character string indicating which spectral analysis method
 should be used. Choose one of "welchPSD" (default) or "spec.pgram".}
+
+\item{plot}{A logical value denoting whether to plot the spectrum. Defaults 
+to FALSE.}
+
+\item{kernel}{An object of class 'tskernel' that defines a smoother for use
+with spec.pgram method.}
+
+\item{segments}{Numeric value indicating the number of windowing segments to
+use with welchPSD method.}
+
+\item{...}{Additional arguments to be passed to spectral analysis functions, 
+such as the 'windowfun' option for welchPSD.}
 }
 \value{
 Data frame of wave parameters based on spectral methods
 }
 \description{
-Calculate ocean wave parameters using spectral analysis
+Calculate ocean wave parameters using spectral analysis methods
 }
 \details{
 Carries out spectral analysis of ocean wave height time series to estimate
 common wave height statistics, including peak period, average period, 
 and significant wave height.
+}
+\examples{
+data(wavedata)
+waveStatsSP(wavedata$SurfaceHeight.m, Fs = 4, method = 'spec.pgram', plot = TRUE)
+}
+\references{
+Original MATLAB function by Urs Neumeier:  
+http://neumeier.perso.ch/matlab/waves.html
 }
 

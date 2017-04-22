@@ -21,7 +21,7 @@ A function to calculate wave number.
 George Voulgaris, SUDO, 1992
 }
 \references{
-Original MATLAB function by Urs Neumeier:  
+Modified from MATLAB function by Urs Neumeier:  
 http://neumeier.perso.ch/matlab/waves.html
 }
 

@@ -1,4 +1,4 @@
-# TODO: implement windowed Welch's method-type spectral analysis
+
 # TODO: fancy up the detrendHeight function to also return h (mean depth) and 
 # coefficients so that I can eliminate the redundant code in prCorr.R
 ###########################################################################
@@ -611,7 +611,7 @@ matlabwaves <- function(waves, Fs = 4) {
 mywaves = wavedata$SurfaceHeight.m
 
 # Function to run full comparison of MATLAB and R methods, and plot results
-runcomparison <- function(mywaves, Fs = 4, plot = FALSE){
+runcomparison <- function(mywaves, Fs = 4, plot = FALSE, dateTime = NULL){
 # Run the matlab analysis
 	matwaves = matlabwaves(mywaves, Fs = Fs)
 # Run the R zero-cross version
@@ -619,7 +619,7 @@ runcomparison <- function(mywaves, Fs = 4, plot = FALSE){
 # Run the R spectral analysis version
 	Rspec.pgram = waveStatsSP(mywaves,Fs = Fs, method = 'spec.pgram')
 # Run the R spectral analysis version
-	Rwelch = waveStatsSP(mywaves,Fs = Fs, method = 'welchPSD', segments = 6)
+	Rwelch = waveStatsSP(mywaves,Fs = Fs, method = 'welchPSD', segments = 4)
 # Reformat results for easy comparison
 	comparo = data.frame(Stat = colnames(matwaves[-7]), 
 			MATLAB = as.vector(unlist(matwaves[1,-7])),
@@ -637,9 +637,14 @@ runcomparison <- function(mywaves, Fs = 4, plot = FALSE){
 	
 	########## 
 	if (plot) {
+		time = ''
+		if (!is.null(dateTime)){
+			time1 = strftime(dateTime[1],format='%y-%m-%d %H:%M')
+		}
+		
 		# Plot the comparison results
 		# Begin with wave height estimates
-		par(mfrow = c(2,1),mar = c(5,5,1,1))
+		par(mfrow = c(2,1),mar = c(5,5,3,1))
 		cexval = 1.5
 		cexaxis = 1.3
 		mybg = 'grey70'
@@ -651,7 +656,8 @@ runcomparison <- function(mywaves, Fs = 4, plot = FALSE){
 				xaxt = 'n',
 				las = 1,
 				ylab = 'Wave height, m', xlab = '',
-				cex.lab = 1.3, cex.axis = cexaxis)
+				cex.lab = 1.3, cex.axis = cexaxis,
+				main = time1)
 		rect(par()$usr[1],par()$usr[3],par()$usr[2],par()$usr[4],col=mybg)
 		grid(nx = NA, ny=NULL, col = 'white', lty = 2)
 		# Plot zero-cross Hmean
@@ -685,6 +691,7 @@ runcomparison <- function(mywaves, Fs = 4, plot = FALSE){
 				col = c('blue','red','green'), cex = 1.2, pch = c(19,18,18), 
 				box.col = mybg, bg = mybg)
 		box()
+		
 		############################################
 		# Plot wave period stats
 		par(mar = c(6,5,1,1))
@@ -729,13 +736,13 @@ runcomparison <- function(mywaves, Fs = 4, plot = FALSE){
 	
 	comparo # Return data frame
 }
-runcomparison(wavedata$SurfaceHeight.m, Fs = 4, plot = TRUE)
+runcomparison(wavedata$SurfaceHeight.m, Fs = 4, plot = TRUE, wavedata$DateTime)
 ################################################################################
 # load Rdata file containing a data frame 'dat' with processed surface height
 # time series from the Elsmore deployment 201610. 
 load('D:/Dropbox/OWHL_misc/Deployment_Elsmore_201610.rda')
 t1 = 1
 # Go through chunks of data and compare MATLAB vs R wave stats results
-runcomparison(dat$swDepthcorr.m[t1:(t1+3600)], Fs = 4, plot = TRUE);t1 = t1+3600
+runcomparison(dat$swDepthcorr.m[t1:(t1+7200)], Fs = 4, plot = TRUE, dat$DateTime[t1:(t1+7200)]);t1 = t1+3600
 
 

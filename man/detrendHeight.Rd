@@ -10,7 +10,16 @@ detrendHeight(pt)
 \item{pt}{A vector of numeric values to be detrended}
 }
 \value{
-A vector of detrended values, with mean approximately equal to zero.
+A list containing the following:
+
+\code{pt} A vector of detrended values 
+
+\code{seg_len} The segment length used 
+
+\code{h} The mean height of the water column
+
+\code{trend} A two element vector of the intercept and slope
+ from the linear regression.
 }
 \description{
 Fits a straight line to a vector of values using lm(), and uses the
@@ -22,5 +31,12 @@ surface height time series before attempting to calculate statistics for
 waves, which are variations above and below the mean surface height. 
 Returns a series of residuals around the linear trend, in the original units
 of measurement (typically meters).
+}
+\examples{
+data(wavedata)
+detrended <- detrendHeight(wavedata$SurfaceHeight.m)
+pt <- detrended[['pt']]
+plot(pt, type = 'l')
+abline(h = 0)
 }
 
