@@ -16,7 +16,23 @@
 
 #' 
 #' @param pt A vector of numeric values to be detrended
-#' @return A vector of detrended values, with mean approximately equal to zero.
+#' @return A list containing the following:
+#' 
+#' @return \code{pt} A vector of detrended values 
+#' 
+#' \code{seg_len} The segment length used 
+#' 
+#' \code{h} The mean height of the water column
+#' 
+#' \code{trend} A two element vector of the intercept and slope
+#'  from the linear regression.
+#' 
+#' @examples 
+#' data(wavedata)
+#' detrended <- detrendHeight(wavedata$SurfaceHeight.m)
+#' pt <- detrended[['pt']]
+#' plot(pt, type = 'l')
+#' abline(h = 0)
 
 detrendHeight <- function(pt){
 	# Determine length of pt
@@ -26,14 +42,16 @@ detrendHeight <- function(pt){
 	# Fit a simple linear regression through the segment of sea surface
 	# height data and extract the intercept + slope
 	trend <- coef(lm(pt ~  x[1:seg_len]))
-	
+	attr(trend,'name') = c('(Intercept)','Slope')
 	# Calculate a depth h at the midpoint of the segment of 
 	# data using the regression coefficients stored in 'trend' 
 	# (i.e. intercept and slope) 
-	h <- trend[1] + ( trend[2] * ( (seg_len+1)/2 ) )  
+	h <- trend[1] + ( trend[2] * ( (seg_len+1)/2 ) ) 
+	attr(h,'name') = 'Mean Depth'
 	
 	# Remove the linear trend from the segment of sea surface heights
 	pt <- pt - (trend[1] + (trend[2]* x[1:seg_len])) 
-	# Return the detrended vector
-	pt
+	# Return the detrended vector, segment length, mean height, and
+	# regression coefficients
+	output = list(pt = pt, seg_len = seg_len, h = h, trend = trend)
 }
