@@ -15,9 +15,9 @@
 ## % written by Urs Neumeier, 2003
 ## % modified from Coast07.m written by T Mason, UPCE, 1999 (psd modified 7/99)
 
-#' Calculate ocean wave parameters using spectral analysis
+#' Calculate ocean wave parameters using spectral analysis methods
 #' 
-#' Calculate ocean wave parameters using spectral analysis
+#' Calculate ocean wave parameters using spectral analysis methods
 #' 
 #' Carries out spectral analysis of ocean wave height time series to estimate
 #' common wave height statistics, including peak period, average period, 
@@ -36,10 +36,14 @@
 #' @param plot A logical value denoting whether to plot the spectrum. Defaults 
 #' to FALSE. 
 #' @param ... Additional arguments to be passed to spectral analysis functions, 
-#' such as windowfun
+#' such as the 'windowfun' option for welchPSD.
 #' @return Data frame of wave parameters based on spectral methods
 #' @references Original MATLAB function by Urs Neumeier:  
 #' http://neumeier.perso.ch/matlab/waves.html
+#' @export
+#' @examples
+#' data(wavedata)
+#' waveStatsSP(wavedata$SurfaceHeight.m, Fs = 4, method = 'spec.pgram', plot = TRUE)
 
 waveStatsSP <- function(PT, Fs, method = c('welchPSD','spec.pgram'), 
 		 plot = FALSE,kernel = NULL, segments = NULL, ...){
@@ -49,10 +53,11 @@ waveStatsSP <- function(PT, Fs, method = c('welchPSD','spec.pgram'),
 	# 
 	method <- match.arg(method, choices = c('welchPSD','spec.pgram'))
 	
-	min_frequency <- 0.05;	#	% mininum frequency, below which no correction is applied (0.05)
-	max_frequency <- 0.33;		#% maximum frequency, above which no correction is applied (0.33)	
-	
-	#
+	# mininum frequency, below which no correction is applied (0.05)
+	min_frequency <- 0.05;	
+	# maximum frequency, above which no correction is applied (0.33)
+	max_frequency <- 0.33;			
+
 	# Prepare data for spectral analysis
 	
 	m <- length(PT);		# Get length of surface height record
@@ -65,8 +70,9 @@ waveStatsSP <- function(PT, Fs, method = c('welchPSD','spec.pgram'),
 	# the data and subtracts the resulting function from the data. The resulting
 	# values represent deviations of surface height from the mean surface 
 	# height in the time series.
-	PT <- oceanwaves::detrendHeight(PT); 
-
+	detrended <- oceanwaves::detrendHeight(PT); 
+	PT <- detrended[['pt']][] # Extract vector of detrended surface heights
+	
 	# Convert timeseries of surface heights to a timeseries object
 	xt <- ts(PT, frequency = Fs)
 	
@@ -106,7 +112,7 @@ waveStatsSP <- function(PT, Fs, method = c('welchPSD','spec.pgram'),
 		M <- 2 * (length(mywaves)/ (Noseg+1)) / Fs
 		seglength <-  M
 		
-		wpsd = welchPSD(xt, seglength = M, two.sided = FALSE, method = 'mean',
+		wpsd <- welchPSD(xt, seglength = M, two.sided = FALSE, method = 'mean',
 				windowingPsdCorrection = TRUE, ...)
 		# Remove the zero-frequency entry
 		wpsd$frequency <- wpsd$frequency[-1]
@@ -123,7 +129,7 @@ waveStatsSP <- function(PT, Fs, method = c('welchPSD','spec.pgram'),
 		for (i in seq(-2,4,by=1)) { # calculation of moments of spectrum
 			# Note that the wpsd$power values are multiplied by 2 to normalize them
 			# in the same fashion as a raw power spectral density estimator
-			moment[i+3]=sum(wpsd$frequency[integmin:integmax]^i*
+			moment[i+3] <- sum(wpsd$frequency[integmin:integmax]^i*
 							(wpsd$power[integmin:integmax]))*deltaf;
 		}
 		# Peak period, calculated from Frequency at maximum of spectrum 
