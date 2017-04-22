@@ -22,20 +22,21 @@
 #' @references Original MATLAB function by Urs Neumeier 
 #' http://neumeier.perso.ch/matlab/waves.html Modified from the Pcorr3.m 
 #' function written by T. Mason, SOC, January 1997
+#' @export
 #' 
 #' Each segment of pt will be linearly detrended, corrected for attenuation,
 #' and the linear trend will be added back to the returned data.
 #' 
 #' @examples 
 #' data(wavedata)
-#' corrected = PrCorr(wavedata$SurfaceHeightRaw.m, Fs = 4, zpt = 0.1)
+#' corrected = prCorr(wavedata$SurfaceHeightRaw.m, Fs = 4, zpt = 0.1)
 #' # Plot the results
 #' plot(x = wavedata$DateTime, y = corrected, type = 'l', 
 #'  ylab='Surface Height, m', xlab = 'Time')
 #' lines(x = wavedata$DateTime, y = wavedata$SurfaceHeightRaw.m, col = 'red')
 #' legend('topleft',legend=c('Corrected','Raw'),col=c('black','red'),lwd = 2)
 
-prCorr <- function(pt, Fs, zpt, M = 512, CorrLim = c(0.05, 0.33) ){
+prCorr <- function(pt, Fs, zpt, M = 512, CorrLim = c(0.05, 0.33), plot = FALSE ){
 	
 	# Normally the maximum attenuation correction should not be higher than 5
 	max_attenuation_correction <- 5
@@ -89,17 +90,13 @@ prCorr <- function(pt, Fs, zpt, M = 512, CorrLim = c(0.05, 0.33) ){
 		seg_len <- length(ptseg)
 		
 		if (do_detrend){
-			# Fit a simple linear regression through the segment of sea surface
-			# height data and extract the intercept + slope
-			trend <- coef(lm(ptseg ~  x[1:seg_len]))
 			
-			# Calculate a depth h at the midpoint of the segment of 
-			# data using the regression coefficients stored in 'trend' 
-			# (i.e. intercept and slope) 
-			h <- trend[1] + ( trend[2] * ( (seg_len+1)/2 ) )  
+			detrended = oceanwaves::detrendHeight(ptseg)
 			
-			# Remove the linear trend from the segment of sea surface heights
-			ptseg <- ptseg - (trend[1] + (trend[2]* x[1:seg_len])) 
+			trend = detrended[['trend']][] # regression coefficients
+			h = detrended[['h']][] # mean height of segment
+			ptseg = detrended[['pt']][] # detrended pressure time series
+			seg_len = detrended[['seg_len']] # segment length
 			
 			# Calculate the wave number for each frequency in f, using the
 			# mean sea surface height h for this segment of data
@@ -186,6 +183,13 @@ prCorr <- function(pt, Fs, zpt, M = 512, CorrLim = c(0.05, 0.33) ){
 	# And rename that to be H
 	H <- H_with_NaN 
 	
+	if (plot) {
+		plot(x = wavedata$DateTime, y = H, type = 'l', 
+				  ylab='Surface Height, m', xlab = 'Time')
+		lines(x = wavedata$DateTime, y = wavedata$SurfaceHeightRaw.m, col = 'red')
+		legend('topleft',legend=c('Corrected','Raw'),col=c('black','red'), lwd = 2)
+	}
+	
 	H # return H with all of the depth-corrected surface heights and the 
 	# missing values (NA) re-inserted. Should be the same length as the input
 	# vector pt. Units should be the same as the original input values
@@ -199,7 +203,7 @@ prCorr <- function(pt, Fs, zpt, M = 512, CorrLim = c(0.05, 0.33) ){
 #' @param f A numeric vector of wave frequencies
 #' @param h A numeric vector of water depths (usually in units of meters)
 #' @return The wave number. 
-#' @references Original MATLAB function by Urs Neumeier:  
+#' @references Modified from MATLAB function by Urs Neumeier:  
 #' http://neumeier.perso.ch/matlab/waves.html
 #' @author George Voulgaris, SUDO, 1992
 
