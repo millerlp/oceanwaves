@@ -46,5 +46,9 @@ legend('topleft',legend=c('Corrected','Raw'),col=c('black','red'),lwd = 2)
 Original MATLAB function by Urs Neumeier 
 http://neumeier.perso.ch/matlab/waves.html Modified from the Pcorr3.m 
 function written by T. Mason, SOC, January 1997
+
+
+Each segment of pt will be linearly detrended, corrected for attenuation,
+and the linear trend will be added back to the returned data.
 }
 
