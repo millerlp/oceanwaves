@@ -1,6 +1,4 @@
 
-# TODO: fancy up the detrendHeight function to also return h (mean depth) and 
-# coefficients so that I can eliminate the redundant code in prCorr.R
 ###########################################################################
 setwd("D:/R_public/oceanwaves") # package must be the working directory
 setwd("~/R_public/oceanwaves") # package must be the working directory
@@ -737,6 +735,83 @@ runcomparison <- function(mywaves, Fs = 4, plot = FALSE, dateTime = NULL){
 	comparo # Return data frame
 }
 runcomparison(wavedata$SurfaceHeight.m, Fs = 4, plot = TRUE, wavedata$DateTime)
+################################################################################
+
+# Process Elsmore Seabird data file
+# D:\Dropbox\OWHL_misc\Deployment_Elsmore_Marguerite_201608\Elsmore_Seabird_Data
+sb = file(paste0("D:/Dropbox/OWHL_misc/Deployment_Elsmore_Marguerite_201608/",
+				"Elsmore_Seabird_Data/SBE26_0168_Midkelp_8.18.16to9.27.16.wb"), open='r')
+# Read first line
+val = readLines(con = sb, n = 1) 
+# Loop until the first line that starts with a * is found
+while( (regexpr(pattern = '[\\*]',val))[1] < 0 ){
+	cat(val,'\n')
+	val = readLines(con = sb, n = 1)
+}
+# Parse the * line
+temp = strsplit(val, split = '\\s+ ')
+burst = as.numeric(temp[[1]][2])
+timeval = as.numeric(temp[[1]][3])
+# Seabird time stamp origin time is midnight, January 1, 1989
+timeval = as.POSIXct(timeval, origin = '1989-1-1', tz = 'UTC')
+# 4th value is the time between individual samples (usually 0.25 seconds)
+sampleInterval = as.numeric(temp[[1]][4])
+# 5th value is the number of samples in the burst (i.e. 4096)
+sampleLength = as.numeric(temp[[1]][5])
+# Create a data frame to hold the values. The DateTimeUTC column will be filled
+# with a sequence of timestamps starting from the initial value given in the
+# metadata line and adding 0.25s to each subsequent time stamp.
+dat = data.frame(DateTimeUTC = seq(timeval,length.out = sampleLength,
+				by=sampleInterval), 
+		Burst = rep(burst,sampleLength),
+		psia = numeric(length = sampleLength))
+# Now read in the next n numeric values, ignoring whitespace. 
+dat[,'psia']= scan(sb, what = double(), n = sampleLength, sep = '',quiet = TRUE)
+# Continue reading additional bursts and append them to 'dat'
+while(1){
+	val = readLines(con = sb, n = 1) # Read next line
+	if ( length(regexpr(pattern = '[\\*]',val)) == 0){
+		# End of file
+		cat('End of file reached\n')
+		break
+	} else if ((regexpr(pattern = '[\\*]',val))[1]  == 1){
+		# Parse the * line
+		temp = strsplit(val, split = '\\s+ ')
+		burst = as.numeric(temp[[1]][2])
+		timeval = as.numeric(temp[[1]][3])
+		# Seabird time stamp origin time is midnight, January 1, 1989
+		timeval = as.POSIXct(timeval, origin = '1989-1-1', tz = 'UTC')
+		sampleInterval = as.numeric(temp[[1]][4])
+		sampleLength = as.numeric(temp[[1]][5])
+	} else {
+		stop('End of file? No * match.')
+		break
+	}
+	oldrows = nrow(dat)
+	tempdat = data.frame(DateTimeUTC = seq(timeval,length.out = sampleLength,
+					by=sampleInterval), 
+			Burst = rep(burst,sampleLength),
+			psia = numeric(length = sampleLength))
+	tempdat[,'psia']= scan(sb, what = double(), n = sampleLength, sep = '',
+			quiet = TRUE)
+	
+	dat = rbind(dat,tempdat)
+}
+close(sb)
+
+####Adding psia to mbar conversion
+dat$mbar <- (dat$psia*68.9476)
+#Adding mbar to meters of seawater conversion
+dat$RawSurfaceHeight.m <- ((dat$mbar-1013.328549)*0.00993117063157399) #1013.328549 is average barometric pressure
+# Round values off to a reasonable precision
+dat$psia = round(dat$psia, digits = 6)
+dat$mbar = round(dat$mbar, digits = 6)
+dat$RawSurfaceHeight.m = round(dat$RawSurfaceHeight.m, digits = 4)
+
+write.csv(dat, file = 'D:/Dropbox/OWHL_misc/Elsmore_Seabird_201608.csv',
+		row.names=FALSE)
+
+
 ################################################################################
 # load Rdata file containing a data frame 'dat' with processed surface height
 # time series from the Elsmore deployment 201610. 
