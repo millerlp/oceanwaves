@@ -823,14 +823,288 @@ runcomparison(dat$swDepthcorr.m[t1:(t1+7200)], Fs = 4, plot = TRUE, dat$DateTime
 
 # Load Elsmore Seabird data extracted from .wb file originally
 sb = read.csv("D:/Dropbox/OWHL_misc/Elsmore_Seabird_201608.csv")
-sb = sb[-(which(sb$RawSurfaceHeight.m < 1)),]
+#sb = sb[-(which(sb$RawSurfaceHeight.m < 1)),]
 sb$DateTimeUTC = as.POSIXct(sb$DateTimeUTC, origin = '1970-1-1',tz='UTC')
 sb$Burst = factor(sb$Burst)
 # Put in pressure correction
-sb$SurfaceHeight.m = prCorr(sb$RawSurfaceHeight.m, Fs = 4, zpt = 0.1)
+bursts = levels(sb$Burst)
+# Each burst must be corrected separately, since they aren't continuous 
+# through time. 
+for (i in 1:length(bursts)){
+	sb$SurfaceHeight.m[sb$Burst == bursts[i] ] = 
+			prCorr(sb$RawSurfaceHeight.m[sb$Burst == bursts[i] ],
+			Fs = 4, zpt = 0.1)
+}
+
+sb$SurfaceHeight.m = round(sb$SurfaceHeight.m, digits = 4)
+write.csv(sb, file = 'D:/Dropbox/OWHL_misc/Elsmore_Seabird_201608.csv',
+		row.names=FALSE)
+
 
 plot(SurfaceHeight.m~DateTimeUTC, data = subset(sb, subset = Burst == 50),type='l')
 lines(RawSurfaceHeight.m~DateTimeUTC, data = subset(sb,subset=Burst==50),col = 'red')
-
+################################################################################
 # Run a comparison of SurfaceHeight.m for the 'dat' and 'sb' data frames at 
 # the same time points (and run the wave stats also).
+
+# Load Elsmore Seabird data extracted from .wb file originally
+sb = read.csv("D:/Dropbox/OWHL_misc/Elsmore_Seabird_201608.csv")
+#sb = sb[-(which(sb$RawSurfaceHeight.m < 1)),]
+sb$DateTimeUTC = as.POSIXct(sb$DateTimeUTC, origin = '1970-1-1',tz='UTC')
+sb$Burst = factor(sb$Burst)
+
+# Cycle through the bursts in sb, pick out the starting time, and find the 
+# matching time in 'dat' (from Deployment_Elsmore_201610.rda).
+
+bursts = levels(sb$Burst)
+
+burstTime = sb$DateTimeUTC[min(which(sb$Burst == bursts[2]))]
+indx = which.min(abs(dat$DateTime - burstTime))
+# Subset out the two data sets
+bird = sb[sb$Burst == bursts[2],] # Seabird data
+owhl = dat[indx:(indx+4095),] # OWHL data
+
+# Visualize how well they overlap
+plot(SurfaceHeight.m~DateTimeUTC, data = bird, type='l')
+lines(swDepthcorr.m~DateTime, data = owhl, col = 'red')
+
+
+owhlZC = waveStatsZC(owhl$swDepthcorr.m, Fs = 4)
+birdZC = waveStatsZC(bird$SurfaceHeight.m, Fs = 4)
+
+################################################################################
+# Function to run full comparison of OWHL and Seabird data, and plot results
+runcomparisonOWHLSeabird <- function(owhlHeight,seabirdHeight, Fs = 4, plot = FALSE, dateTime = NULL){
+
+# Run the R zero-cross version on owhl data
+	owhlZC = waveStatsZC(owhlHeight,Fs = Fs)
+# Run the R spectral analysis version on owhl data
+	owhlspec.pgram = waveStatsSP(owhlHeight,Fs = Fs, method = 'spec.pgram')
+# Run the R zero-cross version on seabird data
+	birdZC = waveStatsZC(seabirdHeight, Fs = Fs)
+# Run the R spectral analysis version on seabird data
+	birdspec.pgram = waveStatsSP(seabirdHeight,Fs = Fs, method = 'spec.pgram')
+
+# Reformat results for easy comparison
+	comparo = data.frame(Stat = c(colnames(owhlspec.pgram),names(owhlZC)), 
+			OWHL = as.vector(c(unlist(owhlspec.pgram),unlist(owhlZC))),
+			Seabird = as.vector(c(unlist(birdspec.pgram),unlist(birdZC))))
+#	# Calculate difference between MATLAB results and R results
+#	comparo$diff = comparo$OWHL - comparo$Seabird
+	
+	
+	# Round off all values to a reasonable precision. Any very small differences
+	# between the two methods will show up as 0. 
+	comparo[,2:3] = round(comparo[,2:3],4)
+	
+	########## 
+	if (plot) {
+		time = ''
+		if (!is.null(dateTime)){
+			time1 = strftime(dateTime[1],format='%Y-%m-%d %H:%M')
+		}
+		
+		# Plot the comparison results
+		# Begin with wave height estimates
+		par(mfrow = c(3,1),mar = c(5,5,3,1))
+		cexval = 1.8
+		cexaxis = 1.3
+		mybg = 'grey70'
+		plot(x = 0, y = 0,
+				type = 'n',
+#				ylim = c(0,max(comparo[c(2,9:12),2:3])),
+			ylim = c(0,2.5),
+				xlim = c(0.5,5.5),
+				xaxt = 'n',
+				las = 1,
+				ylab = 'Wave height, m', xlab = '',
+				cex.lab = 1.3, cex.axis = cexaxis,
+				main = time1)
+		rect(par()$usr[1],par()$usr[3],par()$usr[2],par()$usr[4],col=mybg)
+		grid(nx = NA, ny=NULL, col = 'white', lty = 2)
+		# Plot zero-cross Hmean
+		points(x = c(0.9,1.1), y = c(comparo[10,2:3]), col = c('blue','red'),
+				pch = c(19,18), cex = cexval)
+		# Plot spectral Hsig estimate (Hm0)
+		points(x = c(1.9,2.1),y = c(comparo[2,2:3]), col = c('blue','red'),
+				pch = c(19,18), cex = cexval)
+#		points(x = c(1.9,2.1,2.2),y = c(comparo[2,2:4]), col = c('blue','red','green'),
+#				pch = c(19,18,18), cex = cexval)
+		# Plot zero-cross Hsig estimate
+		points(x = c(2.9,3.1),y = c(comparo[9,2:3]), col = c('blue','red'),
+				pch = c(19,18), cex = cexval)
+		# Plot zero-cross H10 = average height of highest 10% of waves
+		points(x = c(3.9,4.1),y = c(comparo[11,2:3]), col = c('blue','red'),
+				pch = c(19,18), cex = cexval)
+		# Plot zero-cross Hmax = highest overall wave
+		points(x = c(4.9,5.1),y = c(comparo[12,2:3]), col = c('blue','red'),
+				pch = c(19,18), cex = cexval)
+		# Plot point representing the Hsig calculated using timeseries variance
+		points(x = 2.5, y = 4 * sqrt(var(owhlHeight)), pch = 20, col = 'black',
+				cex = cexval)
+		text(x = 2.5, y = 4 * sqrt(var(owhlHeight)), pos = 4, 
+				labels = expression(H[sig]==4%*%sqrt(m[0])))
+		axis(side = 1, at = c(1,2,3,4,5), 
+				label = c('Hmean\nzero cross',
+						'Hs\nspectral','Hs\nzero cross',
+						'H10%\nzero cross',
+						'Hmax\nzero cross'),
+				line = 0, padj = 0.5, tick = FALSE)
+		mtext(side = 1, text = 'Wave height', line = 4, cex = 1.3)
+#		legend('bottomright',legend=c('Matlab estimate','R spec.pgram','R welchPSD'), 
+#				col = c('blue','red','green'), cex = 1.2, pch = c(19,18,18), 
+#				box.col = mybg, bg = mybg)
+		legend('bottomright',legend=c('OWHL','Seabird'), 
+				col = c('blue','red'), cex = 1.2, pch = c(19,18), 
+				box.col = mybg, bg = mybg)
+		box()
+		
+		############################################
+		# Plot wave period stats
+		par(mar = c(6,5,1,1))
+		plot(x = 0, y = 0,
+				type = 'n',
+#				ylim = c(0,max(comparo[c(3,5,6,13,14),2:4])),
+				ylim = c(0,20),
+				xlim = c(0.5,5.5),
+				xaxt = 'n',
+				las = 1,
+				ylab = 'Wave period, s', xlab = '',
+				cex.lab = 1.3, cex.axis = cexaxis)
+		rect(par()$usr[1],par()$usr[3],par()$usr[2],par()$usr[4],col='grey70')
+		grid(nx = NA, ny=NULL, col = 'white', lty = 2)
+		# Plot spectral T_0_1 estimate
+		points(x = c(0.9,1.1), y = c(comparo[5,2:3]), col = c('blue','red'),
+				pch = c(19,18), cex = cexval)
+#		points(x = c(0.9,1.1,1.2), y = c(comparo[5,2:4]), col = c('blue','red','green'),
+#				pch = c(19,18,18), cex = cexval)
+		# Plot spectral T_0_2 estimate
+		points(x = c(1.9,2.1),y = c(comparo[6,2:3]), col = c('blue','red'),
+				pch = c(19,18), cex = cexval)
+#		points(x = c(1.9,2.1,2.2),y = c(comparo[6,2:4]), col = c('blue','red','green'),
+#				pch = c(19,18,18), cex = cexval)
+		# Plot zero-cross mean period T_mean
+		points(x = c(2.9,3.1),y = c(comparo[13,2:3]), col = c('blue','red'),
+				pch = c(19,18), cex = cexval)
+		# Plot zero-cross T_s = period of highest 1/3 of waves
+		points(x = c(3.9,4.1),y = c(comparo[14,2:3]), col = c('blue','red'),
+				pch = c(19,18), cex = cexval)
+		# Plot spectral peak period Tp
+		points(x = c(4.9,5.1),y = c(comparo[3,2:3]), col = c('blue','red'),
+				pch = c(19,18), cex = cexval)
+#		points(x = c(4.9,5.1,5.2),y = c(comparo[3,2:4]), col = c('blue','red','green'),
+#				pch = c(19,18,18), cex = cexval)
+		axis(side = 1, at = c(1,2,3,4,5), 
+				label = c('APD\nspectral\nm_0/m_1',
+						'APD\nspectral\nsqrt(m0/m2)',
+						'T_mean\nzero cross','T_sig\nzero cross',
+						'T_peak\nspectral'),
+				line = 0, padj = 0.5, tick = FALSE)
+		mtext(side = 1, line = 4, text = 'Wave period', cex = 1.3)
+		legend('bottomright',legend=c('OWHL','Seabird'), 
+				col = c('blue','red'), cex = 1.2, pch = c(19,18),
+				box.col = mybg, bg = mybg)
+#		legend('bottomright',legend=c('Matlab estimate','R spec.pgram','R welchPSD'), 
+#				col = c('blue','red','green'), cex = 1.2, pch = c(19,18,18),
+#				box.col = mybg, bg = mybg)
+		box()
+		##################################################
+		# Plot the raw timeseries of each
+		plot(seabird, type = 'l', col = 'black', ylab = 'Surface height, m')
+		lines(owhl, col = 'red')
+		legend('topleft',legend = c('Seabird','OWHL'), col = c('black','red'),
+				lty = c(1,1))
+	}
+	
+	comparo # Return data frame
+}
+
+bursts = levels(sb$Burst)
+
+for (i in 1:length(bursts)){
+	# Get row index of first reading of burst
+	bindx = min(which(sb$Burst == bursts[i]))
+	# Extract date/time for that row index
+	burstTime = sb$DateTimeUTC[bindx]
+	# Find nearest row in dat that matches burstTime
+	indx = which.min(abs(dat$DateTime - burstTime))
+	# Check that the two timestamps in sb and dat are within 10 seconds of 
+	# each other
+	if (abs(difftime(dat$DateTime[indx],
+					sb$DateTimeUTC[bindx],units='secs')) < 10){
+		# Subset out the two data sets
+		bird = sb[bindx:(bindx+4095),] # Seabird data
+		owhl = dat[indx:(indx+4095),] # OWHL data	
+		
+		comparo = runcomparisonOWHLSeabird(owhl$swDepthcorr.m, 
+				bird$SurfaceHeight.m,
+				Fs = 4, plot=FALSE, dateTime=burstTime)
+#		invisible(readline(prompt="Press [enter] to continue"))
+		
+		if (i == 1){
+			OWHLsummary = as.data.frame(matrix(comparo$OWHL, nrow = 1))
+			names(OWHLsummary) = comparo$Stat
+			OWHLsummary$DateTimeUTC = burstTime
+			########
+			Seabirdsummary = as.data.frame(matrix(comparo$Seabird, nrow = 1))
+			names(Seabirdsummary) = comparo$Stat
+			Seabirdsummary$DateTimeUTC = burstTime
+		} else {
+			# Append new data
+			temp = as.data.frame(matrix(comparo$OWHL, nrow = 1))
+			names(temp) = comparo$Stat
+			temp$DateTimeUTC = burstTime
+			OWHLsummary = rbind(OWHLsummary,temp)
+			####
+			temp = as.data.frame(matrix(comparo$Seabird, nrow = 1))
+			names(temp) = comparo$Stat
+			temp$DateTimeUTC = burstTime
+			Seabirdsummary = rbind(Seabirdsummary,temp)
+		}	
+	} else {
+		stop("Time mismatch")
+	}
+}
+
+#write.csv(OWHLsummary,
+#		file='D:/Dropbox/OWHL_misc/Deployment_Elsmore_Marguerite_201608/OWHLsummary.csv',
+#		row.names = FALSE)
+#write.csv(Seabirdsummary,
+#		file='D:/Dropbox/OWHL_misc/Deployment_Elsmore_Marguerite_201608/Seabirdsummary.csv',
+#		row.names = FALSE)
+
+# Spectrum-derived values
+par(mfrow = c(2,1))
+plot(Hm0~DateTimeUTC, data = OWHLsummary, type = 'b', col = 'blue', pch = 20,
+		ylab = 'Significant wave height, m', las = 1)
+lines(Hm0~DateTimeUTC, data = Seabirdsummary, type = 'b', col = 'red', lty =2)
+legend('topright',legend = c('OWHL','Seabird'), pch = c(20,1), 
+		col = c('blue','red'), lty = c(1,2))
+### # period
+plot(Tp~DateTimeUTC, data = OWHLsummary, type = 'b', col = 'blue', pch=20,
+		ylab = 'Peak period, s', las = 1)
+lines(Tp~DateTimeUTC, data = Seabirdsummary, type = 'b', col = 'red', lty = 2)
+legend('topleft',legend = c('OWHL','Seabird'), pch = c(20,1), 
+		col = c('blue','red'), lty = c(1,2))
+
+# Zero-cross derived values
+par(mfrow = c(2,1))
+plot(Hsig~DateTimeUTC, data = OWHLsummary, type = 'b', col = 'blue', pch = 20,
+		ylab = 'Significant wave height, m', las = 1)
+lines(Hsig~DateTimeUTC, data = Seabirdsummary, type = 'b', col = 'red', lty =2)
+legend('topright',legend = c('OWHL','Seabird'), pch = c(20,1), 
+		col = c('blue','red'), lty = c(1,2))
+### # period
+plot(Tsig~DateTimeUTC, data = OWHLsummary, type = 'b', col = 'blue', pch=20,
+		ylab = 'Peak period, s', las = 1)
+lines(Tsig~DateTimeUTC, data = Seabirdsummary, type = 'b', col = 'red', lty = 2)
+legend('topleft',legend = c('OWHL','Seabird'), pch = c(20,1), 
+		col = c('blue','red'), lty = c(1,2))
+
+#for (i in 1:length(bursts)){
+#	# Get row index of first reading of burst
+#	bindx = min(which(sb$Burst == bursts[i]))
+#	# Extract date/time for that row index
+#	burstTime = sb$DateTimeUTC[bindx]
+#	cat(strftime(burstTime,format = "%Y-%m-%d %H:%M:%S"),'\n')
+#}
