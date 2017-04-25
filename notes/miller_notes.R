@@ -1072,8 +1072,8 @@ for (i in 1:length(bursts)){
 #write.csv(Seabirdsummary,
 #		file='D:/Dropbox/OWHL_misc/Deployment_Elsmore_Marguerite_201608/Seabirdsummary.csv',
 #		row.names = FALSE)
-
-# Spectrum-derived values
+#######################################################################
+# Plot spectrum-derived values
 par(mfrow = c(2,1))
 plot(Hm0~DateTimeUTC, data = OWHLsummary, type = 'b', col = 'blue', pch = 20,
 		ylab = 'Significant wave height, m', las = 1)
@@ -1086,8 +1086,8 @@ plot(Tp~DateTimeUTC, data = OWHLsummary, type = 'b', col = 'blue', pch=20,
 lines(Tp~DateTimeUTC, data = Seabirdsummary, type = 'b', col = 'red', lty = 2)
 legend('topleft',legend = c('OWHL','Seabird'), pch = c(20,1), 
 		col = c('blue','red'), lty = c(1,2))
-
-# Zero-cross derived values
+#############################################################
+# Plot zero-cross derived values
 par(mfrow = c(2,1))
 plot(Hsig~DateTimeUTC, data = OWHLsummary, type = 'b', col = 'blue', pch = 20,
 		ylab = 'Significant wave height, m', las = 1)
@@ -1101,10 +1101,4 @@ lines(Tsig~DateTimeUTC, data = Seabirdsummary, type = 'b', col = 'red', lty = 2)
 legend('topleft',legend = c('OWHL','Seabird'), pch = c(20,1), 
 		col = c('blue','red'), lty = c(1,2))
 
-#for (i in 1:length(bursts)){
-#	# Get row index of first reading of burst
-#	bindx = min(which(sb$Burst == bursts[i]))
-#	# Extract date/time for that row index
-#	burstTime = sb$DateTimeUTC[bindx]
-#	cat(strftime(burstTime,format = "%Y-%m-%d %H:%M:%S"),'\n')
-#}
+
