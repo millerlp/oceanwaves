@@ -11,12 +11,12 @@ BugReports:
 Depends:
     R (>= 3.3.0)
 Imports:
-    oce,
     signal,
     bspec
 Suggests:
     ggplot2,
     scales,
+    oce
 License: GPL-3 + file LICENSE
 Encoding: UTF-8
 LazyData: true
