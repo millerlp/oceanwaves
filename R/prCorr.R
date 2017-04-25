@@ -22,11 +22,11 @@
 #' @references Original MATLAB function by Urs Neumeier 
 #' http://neumeier.perso.ch/matlab/waves.html Modified from the Pcorr3.m 
 #' function written by T. Mason, SOC, January 1997
-#' @export
+#' 
 #' 
 #' Each segment of pt will be linearly detrended, corrected for attenuation,
 #' and the linear trend will be added back to the returned data.
-#' 
+#' @export
 #' @examples 
 #' data(wavedata)
 #' corrected = prCorr(wavedata$SurfaceHeightRaw.m, Fs = 4, zpt = 0.1)
