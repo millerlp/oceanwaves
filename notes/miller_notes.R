@@ -746,3 +746,16 @@ t1 = 1
 runcomparison(dat$swDepthcorr.m[t1:(t1+7200)], Fs = 4, plot = TRUE, dat$DateTime[t1:(t1+7200)]);t1 = t1+3600
 
 
+# Load Elsmore Seabird data extracted from .wb file originally
+sb = read.csv("D:/Dropbox/OWHL_misc/Elsmore_Seabird_201608.csv")
+sb = sb[-(which(sb$RawSurfaceHeight.m < 1)),]
+sb$DateTimeUTC = as.POSIXct(sb$DateTimeUTC, origin = '1970-1-1',tz='UTC')
+sb$Burst = factor(sb$Burst)
+# Put in pressure correction
+sb$SurfaceHeight.m = prCorr(sb$RawSurfaceHeight.m, Fs = 4, zpt = 0.1)
+
+plot(SurfaceHeight.m~DateTimeUTC, data = subset(sb, subset = Burst == 50),type='l')
+lines(RawSurfaceHeight.m~DateTimeUTC, data = subset(sb,subset=Burst==50),col = 'red')
+
+# Run a comparison of SurfaceHeight.m for the 'dat' and 'sb' data frames at 
+# the same time points (and run the wave stats also).
