@@ -34,10 +34,10 @@
 waveStatsZC <- function(data, Fs, threshold = NULL, plot = FALSE){
 	# Sanity checks
 	if (!is.vector(data)){
-		error('data must be a vector of wave heights')
+		stop('data must be a vector of wave heights')
 	}
 	if (Fs < 0){
-		error('Frequency Fs must be greater than 0')
+		stop('Frequency Fs must be greater than 0')
 	}
 	
 #% The function was written for zero upward-crossing. 
