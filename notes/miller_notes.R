@@ -1010,8 +1010,8 @@ runcomparisonOWHLSeabird <- function(owhlHeight,seabirdHeight, Fs = 4, plot = FA
 		box()
 		##################################################
 		# Plot the raw timeseries of each
-		plot(seabird, type = 'l', col = 'black', ylab = 'Surface height, m')
-		lines(owhl, col = 'red')
+		plot(seabirdHeight, type = 'l', col = 'black', ylab = 'Surface height, m')
+		lines(owhlHeight, col = 'red')
 		legend('topleft',legend = c('Seabird','OWHL'), col = c('black','red'),
 				lty = c(1,1))
 	}
