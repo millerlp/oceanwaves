@@ -15,4 +15,3 @@ column of spectral power values}
 \description{
 Plot a basic smoothed spectrum
 }
-
