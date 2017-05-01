@@ -2,16 +2,17 @@
 % Please edit documentation in R/plotWaveSpectrum.R
 \name{plotWaveSpectrum}
 \alias{plotWaveSpectrum}
-\title{Plot a basic smoothed spectrum}
+\title{Plot a basic spectrum}
 \usage{
 plotWaveSpectrum(freqspec, Fs)
 }
 \arguments{
-\item{freqspec}{A data frame containing a column of frequencies and a
-column of spectral power values}
+\item{freqspec}{A data frame containing a column of frequencies 'freq' and a
+column of spectral power values 'spec'}
 
 \item{Fs}{Frequency of sampled surface heights, units of Hz}
 }
 \description{
-Plot a basic smoothed spectrum
+Plot a basic spectrum
 }
+

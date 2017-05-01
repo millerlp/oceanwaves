@@ -48,3 +48,4 @@ waveStatsSP(wavedata$SurfaceHeight.m, Fs = 4, method = 'spec.pgram', plot = TRUE
 Original MATLAB function by Urs Neumeier:  
 http://neumeier.perso.ch/matlab/waves.html
 }
+
