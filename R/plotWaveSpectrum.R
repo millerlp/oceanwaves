@@ -26,7 +26,7 @@ plotWaveSpectrum <- function(freqspec, Fs){
 # Convert the period values into frequencies. 
 	g.freqs <- 1 / g.period 
 	
-	myplot <- ggplot(data = subset(freqspec, freq > 1 / (maxPeriod) & 
+	myplot <- ggplot2::ggplot(data = subset(freqspec, freq > 1 / (maxPeriod) & 
 									freq < 1 / (minPeriod) )) + 
 			geom_path(aes(x = freq, y = spec)) + 
 			scale_x_log10("Period, s", breaks = g.freqs, labels = g.labels,
