@@ -9,7 +9,7 @@
 ## Function: waveStatsSP 
 
 ## Spectral wave parameters from pressure transducer data (PT) after 
-## correction of the pressure attenuation (see function pr_corr)
+## correction of the pressure attenuation (see function prCorr)
 #
 ## Ported to R from MATLAB by Luke Miller 2017
 ## % written by Urs Neumeier, 2003
@@ -47,15 +47,12 @@
 
 waveStatsSP <- function(PT, Fs, method = c('welchPSD','spec.pgram'), 
 		 plot = FALSE,kernel = NULL, segments = NULL, ...){
-	# Inputs
-	# PT = vector of pressure transducer values, converted to seawater height
-	#		(height of sea surface above pressure transducer, units = meters)
-	# 
+
 	method <- match.arg(method, choices = c('welchPSD','spec.pgram'))
 	
-	# mininum frequency, below which no correction is applied (0.05)
+	# minimum frequency, below which no correction is applied (0.05 = 20 seconds)
 	min_frequency <- 0.05;	
-	# maximum frequency, above which no correction is applied (0.33)
+	# maximum frequency, above which no correction is applied (0.33 = ~3seconds)
 	max_frequency <- 0.33;			
 
 	# Prepare data for spectral analysis
@@ -109,7 +106,7 @@ waveStatsSP <- function(PT, Fs, method = c('welchPSD','spec.pgram'),
 		} else {
 			Noseg <- segments
 		} 
-		M <- 2 * (length(mywaves)/ (Noseg+1)) / Fs
+		M <- 2 * (length(PT)/ (Noseg+1)) / Fs
 		seglength <-  M
 		
 		wpsd <- welchPSD(xt, seglength = M, two.sided = FALSE, method = 'mean',
@@ -121,19 +118,19 @@ waveStatsSP <- function(PT, Fs, method = c('welchPSD','spec.pgram'),
 		
 		deltaf <- wpsd$frequency[2]-wpsd$frequency[1] # delta-frequency
 		integmin <- min(which(wpsd$frequency >= 0)); # this influences Hm0 and other wave parameters
-		integmax <- max(which(wpsd$frequency <= max_frequency*1.5 ));
+		integmax <- max(which(wpsd$frequency <= max_frequency * 1.5 ));
 		moment <- vector(length = 7)
 		# Calculate moments of the spectrum, from -2nd to 0th to 4th
 		# For a spectrum, the 0th moment represents the variance of the data, and
 		# should be close to the value produced by simply using var(PT)
-		for (i in seq(-2,4,by=1)) { # calculation of moments of spectrum
+		for (i in seq(-2, 4, by = 1)) { # calculation of moments of spectrum
 			# Note that the wpsd$power values are multiplied by 2 to normalize them
 			# in the same fashion as a raw power spectral density estimator
-			moment[i+3] <- sum(wpsd$frequency[integmin:integmax]^i*
-							(wpsd$power[integmin:integmax]))*deltaf;
+			moment[i+3] <- sum(wpsd$frequency[integmin:integmax]^i *
+							(wpsd$power[integmin:integmax])) * deltaf;
 		}
 		# Peak period, calculated from Frequency at maximum of spectrum 
-		Tp <- 1/wpsd$frequency[which.max(wpsd$power)]  # units seconds
+		Tp <- 1 / wpsd$frequency[which.max(wpsd$power)]  # units seconds
 	}
 	
 	# Estimate variance of time series (moment 0)
@@ -144,15 +141,15 @@ waveStatsSP <- function(PT, Fs, method = c('welchPSD','spec.pgram'),
 	Hm0 <- 4 * sqrt(m0) 
 	# T_0_1, average period m0/m1, units seconds. Follows National Data Buoy
 	# Center's method for average period (APD)
-	T_0_1 <- moment[3]/moment[1+3] 
+	T_0_1 <- moment[3] / moment[1+3] 
 	# T_0_2, average period (m0/m2)^0.5, units seconds. Follows Scripp's 
 	# Institute of Oceanography's method for calculating average period (APD)
 	# for their buoys. 
-	T_0_2 <- (moment[0+3]/moment[2+3])^0.5
+	T_0_2 <- (moment[0+3] / moment[2+3])^0.5
 
 	# spectral width parameters
-	EPS2 <- (moment[0+3]*moment[2+3]/moment[1+3]^2-1)^0.5;  
-	EPS4 <- (1 - moment[2+3]^2/(moment[0+3]*moment[4+3]))^0.5;
+	EPS2 <- (moment[0+3] * moment[2+3] / moment[1+3]^2 - 1)^0.5
+	EPS4 <- (1 - moment[2+3]^2 / (moment[0+3]*moment[4+3]) )^0.5
 
 	results <- data.frame(h = h, Hm0 = Hm0, Tp = Tp, m0 = m0, T_0_1 = T_0_1,
 			T_0_2 = T_0_2, EPS2 = EPS2, EPS4 = EPS4)
@@ -162,7 +159,7 @@ waveStatsSP <- function(PT, Fs, method = c('welchPSD','spec.pgram'),
 			freqspec <- data.frame(freq = wpsd$frequency, spec = wpsd$power)	
 		} else if (method == 'spec.pgram'){
 			# Multiply pgram spectrum by 2 to normalize
-			freqspec <- data.frame(freq = pgram$freq, spec = 2*pgram$spec)
+			freqspec <- data.frame(freq = pgram$freq, spec = 2 * pgram$spec)
 		}
 		plotWaveSpectrum(freqspec, Fs)
 	}
