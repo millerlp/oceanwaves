@@ -52,7 +52,7 @@ prCorr <- function(pt, Fs, zpt, M = 512, CorrLim = c(0.05, 0.33), plot = FALSE )
 	# Make a copy of the input depth values
 	H_with_NaN <- pt	
 	# Get the indices of good data (not NA)
-	notNA <- which(!is.nan(pt))
+	notNA <- which( !is.nan(pt) )
 	# Make a reduced copy with only the good rows of pt
 	pt<-pt[notNA] 
 	
@@ -64,10 +64,10 @@ prCorr <- function(pt, Fs, zpt, M = 512, CorrLim = c(0.05, 0.33), plot = FALSE )
 	
 	Noverlap <- M/2	# length of overlap of segments. M is an argument to the
 	# function and has a default of 512
-	N <- (ceiling(m/M)) * M # length of array, will be 
+	N <- ( ceiling(m/M) ) * M # length of array, will be 
 							# zero-padded to nearest multiple of M
 	
-	f <- c(NA, seq(1,(M/2),by = 1) * Fs/M)  
+	f <- c(NA, seq(1, (M/2), by = 1) * Fs/M)  
 	# f will be a vector of frequencies, with a NA in the 1st position. 
 	
 	
@@ -84,19 +84,19 @@ prCorr <- function(pt, Fs, zpt, M = 512, CorrLim = c(0.05, 0.33), plot = FALSE )
 	overlap_window[((M/2)+1):length(overlap_window)] <- 1 - overlap_window[1:(M/2)]
 	
 	# Step through segments of pt vector, detrend the data if needed
-	for (q in seq(1, N-Noverlap,by = Noverlap)){
+	for (q in seq(1, N-Noverlap, by = Noverlap)){
 		o <- min(c(q+M-1, m))
 		ptseg <- pt[q:o]
 		seg_len <- length(ptseg)
 		
 		if (do_detrend){
 			
-			detrended = oceanwaves::detrendHeight(ptseg)
+			detrended <- oceanwaves::detrendHeight(ptseg)
 			
-			trend = detrended[['trend']][] # regression coefficients
-			h = detrended[['h']][] # mean height of segment
-			ptseg = detrended[['pt']][] # detrended pressure time series
-			seg_len = detrended[['seg_len']] # segment length
+			trend <- detrended[['trend']][] # regression coefficients
+			h <- detrended[['h']][] # mean height of segment
+			ptseg <- detrended[['pt']][] # detrended pressure time series
+			seg_len <- detrended[['seg_len']] # segment length
 			
 			# Calculate the wave number for each frequency in f, using the
 			# mean sea surface height h for this segment of data
@@ -123,11 +123,11 @@ prCorr <- function(pt, Fs, zpt, M = 512, CorrLim = c(0.05, 0.33), plot = FALSE )
 			# should substitute
 			# The min() function will return the smaller of 
 			# fb_max+fix(length(K)/10) or length(K)
-			mymin <- min(c(fb_max+trunc(length(K)/10), length(K)))
-			fKlin <- seq(fb_max,mymin, by = 1) 
+			mymin <- min(c(fb_max + trunc(length(K)/10), length(K)))
+			fKlin <- seq(fb_max, mymin, by = 1) 
 			
-			Kpt[fKlin] <- ((seq(length(fKlin),1,by= -1)) * 
-						(Kpt[fb_max]-1)/length(fKlin)) + 1
+			Kpt[fKlin] <- ((seq(length(fKlin), 1, by= -1)) * 
+						(Kpt[fb_max]-1) / length(fKlin)) + 1
 		
 			Kpt[1] <- 1 # Overwrites that NA that's been hanging out in row 1
 			
@@ -186,8 +186,10 @@ prCorr <- function(pt, Fs, zpt, M = 512, CorrLim = c(0.05, 0.33), plot = FALSE )
 	if (plot) {
 		plot(x = wavedata$DateTime, y = H, type = 'l', 
 				  ylab='Surface Height, m', xlab = 'Time')
-		lines(x = wavedata$DateTime, y = wavedata$SurfaceHeightRaw.m, col = 'red')
-		legend('topleft',legend=c('Corrected','Raw'),col=c('black','red'), lwd = 2)
+		lines(x = wavedata$DateTime, y = wavedata$SurfaceHeightRaw.m, 
+				col = 'red')
+		legend('topleft',legend=c('Corrected','Raw'),col=c('black','red'), 
+				lwd = 2)
 	}
 	
 	H # return H with all of the depth-corrected surface heights and the 
@@ -208,13 +210,13 @@ prCorr <- function(pt, Fs, zpt, M = 512, CorrLim = c(0.05, 0.33), plot = FALSE )
 #' @author George Voulgaris, SUDO, 1992
 
 waveNumL <- function(f, h) {
-  w <- 2*pi*f
-  dum1 <- (w^2)*h/9.81
+  w <- 2 * pi * f
+  dum1 <- (w^2) * h / 9.81
   dum2 <- dum1 + 
-    (1.0+0.6522*dum1 + 0.4622*dum1^2 + 0.0864*dum1^4 + 
-       0.0675*dum1^5)^(-1);
-  dum3 <- sqrt(9.81*h*dum2^(-1)) / f
-  y <- 2*pi*dum3^(-1)
+    (1.0 + 0.6522 * dum1 + 0.4622 * dum1^2 + 0.0864 * dum1^4 + 
+       0.0675 * dum1^5)^(-1);
+  dum3 <- sqrt(9.81 * h * dum2^(-1)) / f
+  y <- 2 * pi * dum3^(-1)
   y # return y
 }
 
