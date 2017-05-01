@@ -9,11 +9,11 @@ Description: Calculate ocean wave height summary statistics from pressure sensor
 URL: 
 BugReports: 
 Depends:
-    R (>= 3.3.0)
-Imports:
+    R (>= 3.3.0),
     signal,
-    bspec,
     ggplot2
+Imports:
+	bspec,
 Suggests:
     scales,
     oce
