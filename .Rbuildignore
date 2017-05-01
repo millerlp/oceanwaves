@@ -6,3 +6,5 @@
 ^\.project$  # Eclipse settings file 
 ^\.gitattribute$
 ^\.gitignore$
+^README\.Rmd$
+^README-.*\.png$
