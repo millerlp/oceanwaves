@@ -79,7 +79,7 @@ waveStatsZC <- function(data, Fs, threshold = NULL, plot = FALSE){
 	# first entry should be a zero upward crossing, since we just removed the 
 	# former first entry if it was a downward crossing. Every 2nd entry after 
 	# that should also represent an upward zero crossing event. 
-	crossing <- crossing[seq(1,length(crossing), by = 2)]
+	crossing <- crossing[seq(1, length(crossing), by = 2)]
 
 	# Make a 4-column matrix to hold the height, crest, trough, and period data 
 	# for each wave.
@@ -107,7 +107,7 @@ waveStatsZC <- function(data, Fs, threshold = NULL, plot = FALSE){
 			# If no minimum threshold for wave height was supplied, calculate a
 			# threshold at 1% of the highest wave height (peak to trough) in the 
 			# data set.
-			threshold=0.01 * max(wave[,2] + wave[,3])
+			threshold <- 0.01 * max(wave[,2] + wave[,3])
 		} else if (threshold < 0){
 			# If the supplied threshold was less than 0, throw an error
 			stop('threshold must be greater than 0')
