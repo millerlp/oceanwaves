@@ -96,18 +96,18 @@ waveStatsZC <- function(data, Fs, threshold = NULL, plot = FALSE){
 
 	# If no wave was found in data, then do nothing. Otherwise, process each
 	# wave
-	if (nrow(wave)>0){
+	if ( nrow(wave) > 0 ){
 		# Calculate the time between each upward zero crossing by calculating
 		# the number of rows between each upward crossing and dividing
 		# by the sampling rate (Fs, units of Hz). This will be 
 		# the period for each wave.
-		wave[,4] <- diff(crossing)/Fs		
+		wave[,4] <- diff(crossing) / Fs		
   
 		if (is.null(threshold)){
 			# If no minimum threshold for wave height was supplied, calculate a
 			# threshold at 1% of the highest wave height (peak to trough) in the 
 			# data set.
-			threshold=0.01 * max(wave[,2]+wave[,3])
+			threshold=0.01 * max(wave[,2] + wave[,3])
 		} else if (threshold < 0){
 			# If the supplied threshold was less than 0, throw an error
 			stop('threshold must be greater than 0')
@@ -127,35 +127,35 @@ waveStatsZC <- function(data, Fs, threshold = NULL, plot = FALSE){
 					# with the max crest of wave i-1 or i, and the
 					# max trough of wave i-i or i, and the
 					# duration of wave i-1 and i.
-					 wave[i-1,2:4] <- c(max(wave[(i-1):i,2]),
-							 max(wave[(i-1):i,3]),
-							 sum(wave[(i-1):i,4]))
+					 wave[i-1, 2:4] <- c(max(wave[(i-1):i, 2]),
+							 max(wave[(i-1):i, 3]),
+							 sum(wave[(i-1):i, 4]))
 				 }
 				 # Remove this row that was less than the threshold
-				 wave <- wave[-i,]
+				 wave <- wave[-i, ]
 				 
 			# Next check if the trough was smaller than the threshold
 			# If the trough is small, then this will join the wave data with
 			# the next wave in the series
-			 } else if (wave[i,3] < threshold){
+			 } else if (wave[i, 3] < threshold){
 				 if (i != nrow(wave)){
 					 # If we are on wave 2 or greater, rewrite wave i
 					 # with the max crest of wave i or i+1, and the
 					 # max trough of wave i or i+1, and the
 					 # duration of wave i and i+1.
-					 wave[i,2:4] <- c(max(wave[i:(i+1),2]),
-							 max(wave[i:(i+1),3]),
-							 sum(wave[i:(i+1),4]))
+					 wave[i, 2:4] <- c(max(wave[i:(i+1), 2]),
+							 max(wave[i:(i+1), 3]),
+							 sum(wave[i:(i+1), 4]))
 					 # Remove the data for the next wave in the series
-					 wave <- wave[-(i+1),]
+					 wave <- wave[-(i+1), ]
 				 } else {
-					 wave <- wave[-i,]
+					 wave <- wave[-i, ]
 				 }
 			 }
 		 }
 		 # Add the crest and trough heights together for each wave to get
 		 # overall wave height
-		 wave[,1] <- wave[,2] + wave[,3]
+		 wave[,1] <- wave[, 2] + wave[, 3]
 		
 	} 	
 					
@@ -171,11 +171,11 @@ waveStatsZC <- function(data, Fs, threshold = NULL, plot = FALSE){
 	# Overall mean wave height, for all waves (bigger than threshold)
 	Hmean <- mean(wave[ , 1])
 	# Mean height of the upper 10% of all waves
-	H10 <- mean(wave[1:round(nb*0.1),1])
+	H10 <- mean(wave[1:round(nb*0.1), 1])
 	# Maximum wave height
-	Hmax <- max(wave[,1])
+	Hmax <- max(wave[, 1])
 	# Mean period
-	Tmean <- mean(wave[,4])
+	Tmean <- mean(wave[, 4])
 	# Mean period of Hsig (highest 1/3 of waves)
 	Tsig <- mean(wave[1:round(nb*(1/3)), 4])
 	
