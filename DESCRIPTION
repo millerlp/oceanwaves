@@ -6,8 +6,8 @@ Author: Luke Miller <contact@lukemiller.org>
 Maintainer: Luke Miller <contact@lukemiller.org>
 Description: Calculate ocean wave height summary statistics from pressure sensor
     data
-URL: 
-BugReports: 
+URL: https://github.com/millerlp/oceanwaves
+BugReports: https://github.com/millerlp/oceanwaves/issues
 Depends:
     R (>= 3.3.0),
     signal,
