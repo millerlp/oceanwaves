@@ -50,7 +50,7 @@ detrendHeight <- function(pt){
 	attr(h,'name') = 'Mean Depth'
 	
 	# Remove the linear trend from the segment of sea surface heights
-	pt <- pt - (trend[1] + (trend[2]* x[1:seg_len])) 
+	pt <- pt - (trend[1] + (trend[2] * x[1:seg_len])) 
 	# Return the detrended vector, segment length, mean height, and
 	# regression coefficients
 	output = list(pt = pt, seg_len = seg_len, h = h, trend = trend)
