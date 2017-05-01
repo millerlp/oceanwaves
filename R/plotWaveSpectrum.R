@@ -3,10 +3,10 @@
 # Author: Luke Miller  Apr 21, 2017
 ###############################################################################
 
-#' Plot a basic smoothed spectrum 
+#' Plot a basic spectrum 
 #' 
-#' @param freqspec A data frame containing a column of frequencies and a
-#' column of spectral power values
+#' @param freqspec A data frame containing a column of frequencies 'freq' and a
+#' column of spectral power values 'spec'
 #' @param Fs Frequency of sampled surface heights, units of Hz
 
 plotWaveSpectrum <- function(freqspec, Fs){
@@ -24,15 +24,18 @@ plotWaveSpectrum <- function(freqspec, Fs){
 	g.labels <- rev(c('2s','4','6','8','10','12','14','16','18')) 
 	
 # Convert the period values into frequencies. 
-	g.freqs <- 1/g.period 
+	g.freqs <- 1 / g.period 
 	
-	myplot <- ggplot(data = subset(freqspec, freq > 1/(maxPeriod) & 
-									freq < 1/(minPeriod) )) + 
+	myplot <- ggplot(data = subset(freqspec, freq > 1 / (maxPeriod) & 
+									freq < 1 / (minPeriod) )) + 
 			geom_path(aes(x = freq, y = spec)) + 
-			scale_x_log10("Period", breaks = g.freqs, labels = g.labels) +
-			#		scale_y_continuous(limits = ylims) +
+			scale_x_log10("Period, s", breaks = g.freqs, labels = g.labels,
+					sec.axis = sec_axis(trans = ~., breaks = g.freqs,
+							labels = format(g.freqs, dig=2, 
+									drop0trailing = TRUE), 
+					name = "Frequency, Hz")) +
 			ylab(expression(Spectral~density*","~m^2/Hz)) +
-			theme(plot.title=element_text(hjust=0))  +
+			theme(plot.title = element_text(hjust = 0))  +
 			annotate("text", x = maxfreq, y = maxpower, 
 					label = paste('Tp = ',round(myperiod,1),'s'), hjust = 0,
 					vjust = 0)
