@@ -82,23 +82,23 @@ waveStatsSP <- function(PT, Fs, method = c('welchPSD','spec.pgram'),
 			stop("Kernel for spec.pgram must be of class 'tskernel'")
 		}
 		# Use spec.pgram to estimate power spectral density, with smoothers
-		pgram <- spec.pgram(xt, kernel = kernelval, taper=0.1, plot=FALSE)
-		pgramm0 <- (Fs*mean(pgram$spec))
-		deltaf <- pgram$freq[2]-pgram$freq[1] # bandwidth (Hz)
+		pgram <- stats::spec.pgram(xt, kernel = kernelval, taper=0.1, plot=FALSE)
+		pgramm0 <- (Fs * mean(pgram$spec))
+		deltaf <- pgram$freq[2] - pgram$freq[1] # bandwidth (Hz)
 		integmin <- min(which(pgram$freq >= 0)); # this influences Hm0 and other wave parameters
-		integmax <- max(which(pgram$freq <= max_frequency*1.5 ));
+		integmax <- max(which(pgram$freq <= max_frequency * 1.5 ));
 		moment <- vector(length = 7)
 		# Calculate moments of the spectrum, from -2nd to 0th to 4th
 		# For a spectrum, the 0th moment represents the variance of the data, and
 		# should be close to the value produced by simply using var(PT)
-		for (i in seq(-2,4,by=1)) { # calculation of moments of spectrum
+		for (i in seq(-2, 4, by = 1)) { # calculation of moments of spectrum
 			# Note that the pgram$spec values are multiplied by 2 to normalize them
 			# in the same fashion as a raw power spectral density estimator
 			moment[i+3] <- sum(pgram$freq[integmin:integmax]^i*
 							(2 * pgram$spec[integmin:integmax])) * deltaf;
 		}	
 		# Peak period, calculated from Frequency at maximum of spectrum 
-		Tp <- 1/pgram$freq[which.max(pgram$spec)] # units seconds
+		Tp <- 1 / pgram$freq[which.max(pgram$spec)] # units seconds
 	} else if (method == 'welchPSD'){
 		if (is.null(segments)){
 			# Set default segment length for windowing
@@ -109,7 +109,8 @@ waveStatsSP <- function(PT, Fs, method = c('welchPSD','spec.pgram'),
 		M <- 2 * (length(PT)/ (Noseg+1)) / Fs
 		seglength <-  M
 		
-		wpsd <- welchPSD(xt, seglength = M, two.sided = FALSE, method = 'mean',
+		wpsd <- bspec::welchPSD(xt, seglength = M, two.sided = FALSE, 
+				method = 'mean',
 				windowingPsdCorrection = TRUE, ...)
 		# Remove the zero-frequency entry
 		wpsd$frequency <- wpsd$frequency[-1]
@@ -161,7 +162,7 @@ waveStatsSP <- function(PT, Fs, method = c('welchPSD','spec.pgram'),
 			# Multiply pgram spectrum by 2 to normalize
 			freqspec <- data.frame(freq = pgram$freq, spec = 2 * pgram$spec)
 		}
-		plotWaveSpectrum(freqspec, Fs)
+		oceanwaves::plotWaveSpectrum(freqspec, Fs)
 	}
 		
 	results # Return data frame
