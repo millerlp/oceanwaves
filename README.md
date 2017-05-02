@@ -5,10 +5,12 @@ output: github_document
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
 
-`oceanwaves` provides a set of functions to calculate summary statistics for
-
-ocean waves, using a record of surface heights as input. For sea surface heights
-derived from bottom-mounted pressure transducers, the package also contains a
+`oceanwaves` provides a set of functions to calculate summary
+statistics
+for ocean waves, using a record of surface heights as input. For sea surface
+heights
+deri ved from bottom-mounted pressure transducers, the package also
+contains a
 function `prCorr` to correct for depth attenuation of the pressure signal. 
 
 `waveStatsSP` produces wave height and period statistics using spectral analysis
