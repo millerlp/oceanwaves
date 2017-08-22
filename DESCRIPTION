@@ -1,9 +1,8 @@
 Package: oceanwaves
 Title: Ocean Waves
 Version: 0.0.1
-Date: 2017-03-22
-Author: Luke Miller <contact@lukemiller.org>
-Maintainer: Luke Miller <contact@lukemiller.org>
+Date: 2017-08-22
+Authors@R: c(person("Luke", "Miller", email= "contact@lukemiller.org", role = c("aut","cre")),person("Urs","Neumeier", email = "urs_neumeier@uqar.ca", role = "aut"))
 Description: Calculate ocean wave height summary statistics from pressure sensor
     data
 URL: https://github.com/millerlp/oceanwaves
