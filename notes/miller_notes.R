@@ -12,7 +12,7 @@ data(wavedata) # Load the example wave data
 
 # Basic estimation of significant wave height using surface height variance
 myx = detrendHeight(wavedata$SurfaceHeight.m)
-varx = var(myx)  # Variance of surface height, after detrending
+varx = var(myx$pt)  # Variance of surface height, after detrending
 RawVarHsig = 4*sqrt(varx) # 4 times square root of surface height variance, sig H?
 
 # Using the zero-crossing function to estimate sig. wave height. 
@@ -119,7 +119,7 @@ test_norm(mSn, fNyq, xv)
 ## [1] 0.9990345
 
 fsamp <- 4  #20
-xt <- ts(x, frequency=fsamp)
+xt <- ts(x$pt, frequency=fsamp)
 pgram20 <- spec.pgram(xt, pad=1, taper=0, plot=FALSE)
 pgram01 <- spec.pgram(ts(xt, frequency=1), pad=1, taper=0, plot=FALSE)
 mSn/mean(pgram20$spec) # This will be off by a factor of 2
@@ -140,9 +140,9 @@ fsamp = 4 # sampling rate (Hz)
 x = detrendHeight(wavedata$SurfaceHeight.m)
 #x <- rnorm(N, mean = 0, sd = 1)  # alternate simple test with known variance
 # Calculate variance of the timeseries using the var() function
-xv = var(x)
+xv = var(x$pt)
 # Calculate fast fourier transform
-X = fft(x)
+X = fft(x$pt)
 Sa = Mod(X) # calculate amplitude spectrum 
 Se = Sa^2 # convert to energy spectral density
 
@@ -201,7 +201,7 @@ lines(nyfreqs[-1],Snew[-1], col = 'blue')
 
 ###
 # Use spec.pgram, with smoothers
-xt = ts(x, frequency = fsamp)
+xt = ts(x$pt, frequency = fsamp)
 pgram20 <- spec.pgram(xt, spans = c(9,9,9), taper=0.1, plot=FALSE)
 pgram20m0 = (fsamp*mean(pgram20$spec))
 df = pgram20$freq[2]-pgram20$freq[1] # bandwidth (Hz) (should be same as values from diff(nyfreqs)
@@ -288,8 +288,8 @@ seg_len = length(swHeight)
 secs = seq(0,seg_len, by = 0.25)  # 4Hz data = 0.25s steps
 x = seq(1,seg_len,by = 1)
 # Remove any linear trend (i.e. tide) from sea water height
-swHeight = detrendHeight(swHeight)
-
+swHeightdetrend = detrendHeight(swHeight)
+swHeight = swHeightdetrend$pt
 # Calculate the dominant wave period. 
 # Start with the spectrum periodogram function. The spans are just a 
 # guess, and should be adjusted some day (they affect smoothing)
@@ -362,7 +362,8 @@ NDBCspectrumOld = data.frame(Band = seq(1,33,by=1),
 # the relevant frequencies in each band define in NDBCspectrum. 
 
 swHeight = wavedata$SurfaceHeight.m
-swHeight = detrendHeight(swHeight)
+swHeightdetrend = detrendHeight(swHeight)
+swHeight = swHeightdetrend$pt
 myspec = mvspec(swHeight, spans=c(13,11,3), taper = 0.5, plot = FALSE)
 spec.df <- data.frame(freq =myspec$freq, spec = myspec$spec)
 
