@@ -27,12 +27,14 @@
 #' \code{trend} A two element vector of the intercept and slope
 #'  from the linear regression.
 #' 
+#' @export
 #' @examples 
 #' data(wavedata)
 #' detrended <- detrendHeight(wavedata$SurfaceHeight.m)
 #' pt <- detrended[['pt']]
 #' plot(pt, type = 'l')
 #' abline(h = 0)
+
 
 detrendHeight <- function(pt){
 	# Determine length of pt
