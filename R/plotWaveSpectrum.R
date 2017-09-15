@@ -8,6 +8,7 @@
 #' @param freqspec A data frame containing a column of frequencies 'freq' and a
 #' column of spectral power values 'spec'
 #' @param Fs Frequency of sampled surface heights, units of Hz
+#' @export
 
 plotWaveSpectrum <- function(freqspec, Fs){
 	# Extract the frequency associated with the peak spectral density
