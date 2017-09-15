@@ -23,8 +23,8 @@
 #' common wave height statistics, including peak period, average period, 
 #' and significant wave height.
 #' 
-#' @param PT A vector of surface heights that constitute a time series of 
-#' observations. Units = meters
+#' @param data A vector of surface heights that constitute a time series of 
+#' observations. Typical units = meters.
 #' @param Fs Sampling frequency of the surface heights data. Units = Hz, i.e.
 #' samples per second.
 #' @param method A character string indicating which spectral analysis method
@@ -74,7 +74,7 @@
 #' data(wavedata)
 #' waveStatsSP(wavedata$SurfaceHeight.m, Fs = 4, method = 'spec.pgram', plot = TRUE)
 
-waveStatsSP <- function(PT, Fs, method = c('welchPSD', 'spec.pgram'), 
+waveStatsSP <- function(data, Fs, method = c('welchPSD', 'spec.pgram'), 
 		 plot = FALSE, kernel = NULL, segments = NULL, ...){
 
 	method <- match.arg(method, choices = c('welchPSD','spec.pgram'))
@@ -86,21 +86,21 @@ waveStatsSP <- function(PT, Fs, method = c('welchPSD', 'spec.pgram'),
 
 	# Prepare data for spectral analysis
 	
-	m <- length(PT);		# Get length of surface height record
+	m <- length(data);		# Get length of surface height record
 
 	#####################
-	h <- mean(PT);			#% mean water depth
+	h <- mean(data);			#% mean water depth
 	
 	# Call oceanwaves::detrendHeight() 
 	# Function that computes the least-squares fit of a straight line to 
 	# the data and subtracts the resulting function from the data. The resulting
 	# values represent deviations of surface height from the mean surface 
 	# height in the time series.
-	detrended <- oceanwaves::detrendHeight(PT); 
-	PT <- detrended[['pt']][] # Extract vector of detrended surface heights
+	detrended <- oceanwaves::detrendHeight(data); 
+	data <- detrended[['pt']][] # Extract vector of detrended surface heights
 	
 	# Convert timeseries of surface heights to a timeseries object
-	xt <- ts(PT, frequency = Fs)
+	xt <- ts(data, frequency = Fs)
 	
 	if (method == 'spec.pgram'){
 		if (is.null(kernel)){
@@ -119,7 +119,7 @@ waveStatsSP <- function(PT, Fs, method = c('welchPSD', 'spec.pgram'),
 		moment <- vector(length = 7)
 		# Calculate moments of the spectrum, from -2nd to 0th to 4th
 		# For a spectrum, the 0th moment represents the variance of the data, and
-		# should be close to the value produced by simply using var(PT)
+		# should be close to the value produced by simply using var(data)
 		for (i in seq(-2, 4, by = 1)) { # calculation of moments of spectrum
 			# Note that the pgram$spec values are multiplied by 2 to normalize them
 			# in the same fashion as a raw power spectral density estimator
@@ -135,7 +135,7 @@ waveStatsSP <- function(PT, Fs, method = c('welchPSD', 'spec.pgram'),
 		} else {
 			Noseg <- segments
 		} 
-		M <- 2 * (length(PT)/ (Noseg+1)) / Fs
+		M <- 2 * (length(data)/ (Noseg+1)) / Fs
 		seglength <-  M
 		
 		wpsd <- bspec::welchPSD(xt, seglength = M, two.sided = FALSE, 
@@ -152,7 +152,7 @@ waveStatsSP <- function(PT, Fs, method = c('welchPSD', 'spec.pgram'),
 		moment <- vector(length = 7)
 		# Calculate moments of the spectrum, from -2nd to 0th to 4th
 		# For a spectrum, the 0th moment represents the variance of the data, and
-		# should be close to the value produced by simply using var(PT)
+		# should be close to the value produced by simply using var(data)
 		for (i in seq(-2, 4, by = 1)) { # calculation of moments of spectrum
 			# Note that the wpsd$power values are multiplied by 2 to normalize them
 			# in the same fashion as a raw power spectral density estimator
