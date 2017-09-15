@@ -4,12 +4,12 @@
 \alias{waveStatsSP}
 \title{Calculate ocean wave parameters using spectral analysis methods}
 \usage{
-waveStatsSP(PT, Fs, method = c("welchPSD", "spec.pgram"), plot = FALSE,
+waveStatsSP(data, Fs, method = c("welchPSD", "spec.pgram"), plot = FALSE,
   kernel = NULL, segments = NULL, ...)
 }
 \arguments{
-\item{PT}{A vector of surface heights that constitute a time series of 
-observations. Units = meters}
+\item{data}{A vector of surface heights that constitute a time series of 
+observations. Typical units = meters.}
 
 \item{Fs}{Sampling frequency of the surface heights data. Units = Hz, i.e.
 samples per second.}
