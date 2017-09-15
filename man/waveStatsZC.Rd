@@ -8,7 +8,7 @@ waveStatsZC(data, Fs, threshold = NULL, plot = FALSE)
 }
 \arguments{
 \item{data}{A numeric vector of water surface height data. The data do not
-need to be detrended prior to use.}
+need to be detrended prior to use. Typical units = meters}
 
 \item{Fs}{Sampling frequency of the data, in Hz.}
 
@@ -19,9 +19,24 @@ be considered a wave.}
 periods are desired.}
 }
 \value{
-A list object containing summary statistic values. Includes
-significant wave height, mean wave height, 1/10th wave height, maximum wave
-height, mean wave period, significant period.
+A list object containing summary statistic values.
+
+\itemize{
+  \item \code{Hsig} Mean of the highest 1/3 of waves in the data set. Units = 
+  same as input surface heights.
+
+  \item \code{Hmean}  Overall mean wave height, for all waves (bigger than 
+  threshold). 
+
+  \item \code{H10} Mean height of the upper 10\% of all waves. 
+
+  \item \code{Hmax} Maximum wave height in the input data.
+
+  \item \code{Tmean} Mean period of all waves (bigger than threshold). 
+  Units = seconds.
+
+  \item \code{Tsig} Mean period of \code{Hsig} (highest 1/3 of waves).
+}
 }
 \description{
 Calculate ocean wave summary statistics, including significant
@@ -33,10 +48,14 @@ provided by Urs Neumeier, v1.06.
 }
 \examples{
 data(wavedata)
-waveStatsZC(data = wavedata$SurfaceHeight.m, Fs = 4)
+waveStatsZC(data = wavedata$SurfaceHeight.m, Fs = 4, plot = TRUE)
 }
 \references{
 Original MATLAB function by Urs Neumeier:  
 http://neumeier.perso.ch/matlab/waves.html
+}
+\seealso{
+\code{\link{waveStatsSP}} for wave statistics determined using 
+spectral analysis methods.
 }
 
