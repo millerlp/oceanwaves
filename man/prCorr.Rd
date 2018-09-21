@@ -51,4 +51,3 @@ function written by T. Mason, SOC, January 1997
 Each segment of pt will be linearly detrended, corrected for attenuation,
 and the linear trend will be added back to the returned data.
 }
-

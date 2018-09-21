@@ -15,4 +15,3 @@ column of spectral power values 'spec'}
 \description{
 Plot a basic spectrum
 }
-

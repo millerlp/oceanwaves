@@ -58,4 +58,3 @@ http://neumeier.perso.ch/matlab/waves.html
 \code{\link{waveStatsSP}} for wave statistics determined using 
 spectral analysis methods.
 }
-

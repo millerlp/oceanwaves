@@ -24,4 +24,3 @@ within the square root of machine tolerance for a floating point number.
 \details{
 Returns TRUE for all vector elements that are within rounding error of zero.
 }
-

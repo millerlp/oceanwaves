@@ -77,4 +77,3 @@ http://neumeier.perso.ch/matlab/waves.html
 \code{\link{waveStatsZC}} for wave statistics determined using a 
 zero-crossing algorithm.
 }
-

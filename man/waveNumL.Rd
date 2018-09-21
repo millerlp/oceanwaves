@@ -17,11 +17,10 @@ The wave number.
 \description{
 A function to calculate wave number.
 }
-\author{
-George Voulgaris, SUDO, 1992
-}
 \references{
 Modified from MATLAB function by Urs Neumeier:  
 http://neumeier.perso.ch/matlab/waves.html
 }
-
+\author{
+George Voulgaris, SUDO, 1992
+}
