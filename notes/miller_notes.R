@@ -622,9 +622,9 @@ runcomparison <- function(mywaves, Fs = 4, plot = FALSE, dateTime = NULL){
 # Reformat results for easy comparison
 	comparo = data.frame(Stat = colnames(matwaves[-7]), 
 			MATLAB = as.vector(unlist(matwaves[1,-7])),
-			Rspec.pgram = c(as.vector(unlist(Rspec.pgram[1,])),
+			Rspec.pgram = c(as.vector(unlist(Rspec.pgram[])),  # was Rspec.pgram[1,]
 					as.vector(unlist(Rzc[1:6]))),
-			Rwelch = c(as.vector(unlist(Rwelch[1,])),
+			Rwelch = c(as.vector(unlist(Rwelch[])), # was Rwelch[1,]
 					as.vector(unlist(Rzc[1:6]))))
 	# Calculate difference between MATLAB results and R results
 	comparo$diffMvRspec = comparo$MATLAB - comparo$Rspec.pgram
@@ -856,13 +856,14 @@ sb$Burst = factor(sb$Burst)
 
 # Cycle through the bursts in sb, pick out the starting time, and find the 
 # matching time in 'dat' (from Deployment_Elsmore_201610.rda).
+load('D:/Dropbox/OWHL_misc/Deployment_Elsmore_201610.rda')
 
 bursts = levels(sb$Burst)
 
-burstTime = sb$DateTimeUTC[min(which(sb$Burst == bursts[2]))]
+burstTime = sb$DateTimeUTC[min(which(sb$Burst == bursts[4]))]
 indx = which.min(abs(dat$DateTime - burstTime))
 # Subset out the two data sets
-bird = sb[sb$Burst == bursts[2],] # Seabird data
+bird = sb[sb$Burst == bursts[4],] # Seabird data
 owhl = dat[indx:(indx+4095),] # OWHL data
 
 # Visualize how well they overlap
@@ -887,7 +888,7 @@ runcomparisonOWHLSeabird <- function(owhlHeight,seabirdHeight, Fs = 4, plot = FA
 	birdspec.pgram = waveStatsSP(seabirdHeight,Fs = Fs, method = 'spec.pgram')
 
 # Reformat results for easy comparison
-	comparo = data.frame(Stat = c(colnames(owhlspec.pgram),names(owhlZC)), 
+	comparo = data.frame(Stat = c(names(owhlspec.pgram),names(owhlZC)), 
 			OWHL = as.vector(c(unlist(owhlspec.pgram),unlist(owhlZC))),
 			Seabird = as.vector(c(unlist(birdspec.pgram),unlist(birdZC))))
 #	# Calculate difference between MATLAB results and R results
@@ -1021,6 +1022,7 @@ runcomparisonOWHLSeabird <- function(owhlHeight,seabirdHeight, Fs = 4, plot = FA
 }
 
 bursts = levels(sb$Burst)
+bursts = bursts[-(1:3)] # Start with burst in the 4th position
 
 for (i in 1:length(bursts)){
 	# Get row index of first reading of burst
