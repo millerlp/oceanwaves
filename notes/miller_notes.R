@@ -800,8 +800,8 @@ while(1){
 }
 close(sb)
 
-####Adding psia to mbar conversion
-dat$mbar <- (dat$psia*68.9476)
+#### psia to mbar conversion
+dat$mbar <- (dat$psia*68.94757)  # (1 psi = 68.94757 mbar)
 #Adding mbar to meters of seawater conversion
 dat$RawSurfaceHeight.m <- ((dat$mbar-1013.328549)*0.00993117063157399) #1013.328549 is average barometric pressure
 # Round values off to a reasonable precision
