@@ -49,7 +49,7 @@ List of wave parameters based on spectral methods.
   Data Buoy Center's method for average period (APD).
 
   \item \code{T_0_2} Average period \eqn{(m0/m2)^0.5}, units seconds. Follows 
-  Scripp's Institute of Oceanography's method for calculating average period 
+  Scripps Institute of Oceanography's method for calculating average period 
   (APD) for their buoys.
 
   \item \code{EPS2} Spectral width parameter.
