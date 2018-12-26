@@ -4,8 +4,8 @@
 \alias{waveStatsSP}
 \title{Calculate ocean wave parameters using spectral analysis methods}
 \usage{
-waveStatsSP(data, Fs, method = c("welchPSD", "spec.pgram"), plot = FALSE,
-  kernel = NULL, segments = NULL, ...)
+waveStatsSP(data, Fs, method = c("welchPSD", "spec.pgram"),
+  plot = FALSE, kernel = NULL, segments = NULL, ...)
 }
 \arguments{
 \item{data}{A vector of surface heights that constitute a time series of 
