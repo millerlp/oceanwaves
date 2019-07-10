@@ -4,7 +4,7 @@
 #' 
 #' Bottom-mounted pressure transducers suffer from pressure signal 
 #' attenuation when attempting to estimate surface wave heights. This 
-#' function corrected water surface height time series based on the
+#' function corrects water surface height time series based on the
 #' depth of the water column and height of the sensor above the bottom.
 #' 
 #' @param pt A vector of water surface heights (units of meters usually).
@@ -14,7 +14,7 @@
 #' and attenuation correction operations. 512 samples is the default, should be
 #' an even number.
 #' @param CorrLim [min max] frequency for attenuation correction (Hz, optional, 
-#' default [0.05 0.33]).
+#' default [0.05 0.33], which translate to periods of 20 sec to 3 sec).
 #' @return A vector of the depth-corrected surface heights (units of meters 
 #' usually). Any original trend in the input data (such as tide change) is 
 #' present in the output data. The returned surface height fluctuations will 
