@@ -19,7 +19,7 @@ and attenuation correction operations. 512 samples is the default, should be
 an even number.}
 
 \item{CorrLim}{[min max] frequency for attenuation correction (Hz, optional, 
-default [0.05 0.33]).}
+default [0.05 0.33], which translate to periods of 20 sec to 3 sec).}
 }
 \value{
 A vector of the depth-corrected surface heights (units of meters 
@@ -30,7 +30,7 @@ typically be more extreme than the raw input surface heights.
 \description{
 Bottom-mounted pressure transducers suffer from pressure signal 
 attenuation when attempting to estimate surface wave heights. This 
-function corrected water surface height time series based on the
+function corrects water surface height time series based on the
 depth of the water column and height of the sensor above the bottom.
 }
 \examples{
