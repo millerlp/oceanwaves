@@ -1,0 +1,28 @@
+#' Example wave records
+#'
+#' A dataset containing pressure records and derived sea surface height  
+#' from a bottom-mounted pressure transducer data logger deployed at 
+#' Marguerite Reef near Los Angeles, CA, USA. The device was deployed at 
+#' a depth of approximately 10 meters, and sea level air pressure was 
+#' 1014 mbar at the time of deployment. The pressure data logger was 
+#' mounted approximately 10 cm above the benthos. Sampling rate was 4 Hz, 
+#' so the total record represents 30 minutes of time. 
+#' 
+#' @format A data frame with 7200 rows and 4 variables:
+#' \describe{
+#'   \item{DateTime}{Date and time, with fractional seconds. UTC time zone.}
+#'   \item{absPressure.mbar}{Absolute pressure recorded by the data logger, in 
+#'   units of millibar (1 mbar = 100 Pascal). This value includes pressure
+#'   due to the atmosphere above the sea surface, which was 1014 mbar during the
+#'   deployment.}
+#'   \item{swPressure.mbar}{Pressure produced by the column of seawater 
+#'   above the data logger. 
+#'   The pressure due to the atmosphere above the sea surface has been subtracted
+#'   off of the absolute pressure value absPressure.mbar to produce this value. 
+#'   Units of mbar.}
+#'   \item{swDepth.m}{Estimated depth in meters of the seawater column above the
+#'   pressure data logger, converted from the swPressure.mbar value.}
+#'   
+#' }
+#' @source 2016 Provided by Kristin Elsmore, UC Davis Bodega Marine Laboratory
+"wavedata"
