@@ -52,3 +52,4 @@ Temporary Items
 # Eclipse files
 *.project
 *.settings
+.Rproj.user
