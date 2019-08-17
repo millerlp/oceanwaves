@@ -11,10 +11,6 @@ load_all() # Actually load the functions in oceanwaves
 data(wavedata) # Load the example wave data
 
 
-# TODOs: 
-# Provide wave data with raw pressure in mbar
-# Add info to README about the wavedata data set
-
 #######################################################################
 # Basic estimation of significant wave height using surface height variance
 myx = detrendHeight(wavedata$SurfaceHeight.m)
