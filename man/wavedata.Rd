@@ -11,7 +11,8 @@
   units of millibar (1 mbar = 100 Pascal). This value includes pressure
   due to the atmosphere above the sea surface, which was 1014 mbar during the
   deployment.}
-  \item{swPressure.mbar}{Pressure due to seawater recorded by the data logger. 
+  \item{swPressure.mbar}{Pressure produced by the column of seawater 
+  above the data logger. 
   The pressure due to the atmosphere above the sea surface has been subtracted
   off of the absolute pressure value absPressure.mbar to produce this value. 
   Units of mbar.}
@@ -20,7 +21,7 @@
   
 }}
 \source{
-Kristin Elsmore, UC Davis Bodega Marine Laboratory
+2016 Provided by Kristin Elsmore, UC Davis Bodega Marine Laboratory
 }
 \usage{
 wavedata
