@@ -11,6 +11,26 @@ load_all() # Actually load the functions in oceanwaves
 data(wavedata) # Load the example wave data
 
 
+############################################################
+# Generate set of x values, at 0.25sec interval
+x = seq(0,(5*60)-0.25,by = 0.25)
+# Signal with 3 sec and larger 15 sec period cycles
+y = sin(2*pi*(1/3)*x) + 1.5*sin(2*pi*(1/15)*(x))
+plot(x,y,type='l')
+waveStatsSP(y,Fs = 4, plot=TRUE)
+waveStatsZC(y,Fs = 4)
+
+# 5 sec and 12 sec period cycles
+y = sin(2*pi*(1/5)*x) + 1.5*sin(2*pi*(1/12)*(x))
+plot(x,y,type='l')
+waveStatsSP(y,Fs = 4, plot=TRUE)
+waveStatsZC(y,Fs = 4)
+
+# 12 second period cycle only
+y =  1.5*sin(2*pi*(1/12)*(x))
+plot(x,y,type='l')
+waveStatsSP(y,Fs = 4, plot=TRUE)
+waveStatsZC(y,Fs = 4)
 #######################################################################
 # Basic estimation of significant wave height using surface height variance
 myx = detrendHeight(wavedata$SurfaceHeight.m)
