@@ -1,7 +1,7 @@
 Package: oceanwaves
 Title: oceanwaves: Ocean Wave Statistics
 Version: 0.0.1
-Date: 2017-08-22
+Date: 2019-08-17
 Authors@R: c(person("Luke", "Miller", email= "contact@lukemiller.org", role = c("aut","cre")),person("Urs","Neumeier", email = "urs_neumeier@uqar.ca", role = "aut"))
 Description: Calculate ocean wave height summary statistics and process data from bottom-mounted pressure sensor data loggers.
 URL: https://github.com/millerlp/oceanwaves
