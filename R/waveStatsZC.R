@@ -12,7 +12,8 @@
 #' wave height and period. 
 #' 
 #' Based on an upward zero-crossing algorithm originally
-#' provided by Urs Neumeier, v1.06. 
+#' provided by Urs Neumeier, v1.06. However, by default the algorithm
+#' is run as a downward zero-crossing process by inverting the data.
 #' 
 #' @param data A numeric vector of water surface height data. The data do not
 #' need to be detrended prior to use. Typical units = meters
