@@ -44,11 +44,12 @@ wave height and period.
 }
 \details{
 Based on an upward zero-crossing algorithm originally
-provided by Urs Neumeier, v1.06.
+provided by Urs Neumeier, v1.06. However, by default the algorithm
+is run as a downward zero-crossing process by inverting the data.
 }
 \examples{
 data(wavedata)
-waveStatsZC(data = wavedata$SurfaceHeight.m, Fs = 4, plot = TRUE)
+waveStatsZC(data = wavedata$swDepth.m, Fs = 4, plot = TRUE)
 }
 \references{
 Original MATLAB function by Urs Neumeier:  

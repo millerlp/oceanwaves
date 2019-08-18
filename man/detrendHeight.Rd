@@ -34,7 +34,7 @@ of measurement (typically meters).
 }
 \examples{
 data(wavedata)
-detrended <- detrendHeight(wavedata$SurfaceHeight.m)
+detrended <- detrendHeight(wavedata$swDepth.m)
 pt <- detrended[['pt']]
 plot(pt, type = 'l')
 abline(h = 0)

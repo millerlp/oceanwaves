@@ -67,7 +67,7 @@ and significant wave height.
 }
 \examples{
 data(wavedata)
-waveStatsSP(wavedata$SurfaceHeight.m, Fs = 4, method = 'spec.pgram', plot = TRUE)
+waveStatsSP(wavedata$swDepth.m, Fs = 4, method = 'spec.pgram', plot = TRUE)
 }
 \references{
 Original MATLAB function by Urs Neumeier:  
