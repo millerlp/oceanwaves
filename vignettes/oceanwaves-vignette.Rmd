@@ -123,7 +123,7 @@ height data. We will use two different approaches to arrive at roughly the same 
 
 A zero-crossing algorithm for determining wave height and wave length should be relatively intuitive. If you want to describe the height of waves, and how often they come by, you can just establish what the still water level would be, and then measure the height and length of each wave based on when (and how high) the water level rises above the still water level (the start of a wave), then drops below, and finally rises above the still water level again (the end of the wave, and start of the next wave). If you start each wave as it rises above the still water level, this is an 'up-crossing' algorithm. Similarly, you could do the same routine, but start counting each wave when the water drops below the still water level instead, which is referred to as a 'down-crossing' algorithm. Using a zero-crossing algorithm (both up-crossing and down-crossing versions) is also referred to as wave-by-wave analysis or wave train analysis. 
 
-The `oceanwaves` package implements an up-crossing algorithm in the function `waveStatsZC`, which should be supplied with a vector of water surface heights and the sampling frequency of the data (4 Hz for our 
+The `oceanwaves` package implements an down-crossing algorithm in the function `waveStatsZC`, which should be supplied with a vector of water surface heights and the sampling frequency of the data (4 Hz for our 
 example `wavedata`).
 
 ```{r ZC}
