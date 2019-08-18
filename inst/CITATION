@@ -1,0 +1,15 @@
+citHeader("To cite oceanwaves in publications use:")
+
+citEntry(entry = "Manual",
+  title        = "oceanwaves: Ocean Wave Statistics",
+  author       = personList(as.person("Luke P. Miller"),
+                   as.person("Urs Neumeier")),
+  year         = "2019",
+  note         = "R package version 0.0.1",
+  url          = "https://github.com/millerlp/oceanwaves",
+
+  textVersion  =
+  paste("Luke P. Miller and Urs Neumeier (2019).",
+        "oceanwaves: Ocean Wave Statistics",
+        "https://github.com/millerlp/oceanwaves")
+)
