@@ -72,7 +72,7 @@
 #' @export
 #' @examples
 #' data(wavedata)
-#' waveStatsSP(wavedata$SurfaceHeight.m, Fs = 4, method = 'spec.pgram', plot = TRUE)
+#' waveStatsSP(wavedata$swDepth.m, Fs = 4, method = 'spec.pgram', plot = TRUE)
 
 waveStatsSP <- function(data, Fs, method = c('welchPSD', 'spec.pgram'), 
 		 plot = FALSE, kernel = NULL, segments = NULL, ...){

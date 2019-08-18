@@ -46,7 +46,7 @@
 #' spectral analysis methods.
 #' @examples
 #' data(wavedata)
-#' waveStatsZC(data = wavedata$SurfaceHeight.m, Fs = 4, plot = TRUE)
+#' waveStatsZC(data = wavedata$swDepth.m, Fs = 4, plot = TRUE)
 #' @export
 
 waveStatsZC <- function(data, Fs, threshold = NULL, plot = FALSE){

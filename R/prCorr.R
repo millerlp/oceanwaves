@@ -29,11 +29,11 @@
 #' @export
 #' @examples 
 #' data(wavedata)
-#' corrected = prCorr(wavedata$SurfaceHeightRaw.m, Fs = 4, zpt = 0.1)
+#' corrected = prCorr(wavedata$swPressure.mbar, Fs = 4, zpt = 0.1)
 #' # Plot the results
 #' plot(x = wavedata$DateTime, y = corrected, type = 'l', 
 #'  ylab='Surface Height, m', xlab = 'Time')
-#' lines(x = wavedata$DateTime, y = wavedata$SurfaceHeightRaw.m, col = 'red')
+#' lines(x = wavedata$DateTime, y = wavedata$swPressure.mbar, col = 'red')
 #' legend('topleft',legend=c('Corrected','Raw'),col=c('black','red'),lwd = 2)
 
 prCorr <- function(pt, Fs, zpt, M = 512, CorrLim = c(0.05, 0.33), plot = FALSE ){
