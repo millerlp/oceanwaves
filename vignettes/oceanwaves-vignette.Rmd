@@ -100,8 +100,8 @@ swDepthCorrected.m = prCorr(swDepth.m, Fs = 4, zpt = 0.1)
 We'll plot the corrected data and the uncorrected data on the same plot to show how the correction changes the estimated sea surface heights. 
 
 ```{r, fig.width = 8, fig.height = 4}
-plot(swDepthCorrected.m, type = 'l', col = 'red', ylab = 'Surface height, m')
-lines(swDepth.m, col = 'blue')
+plot(x = wavedata$DateTime, y = swDepthCorrected.m, type = 'l', col = 'red', ylab = 'Surface height, m')
+lines(x = wavedata$DateTime, y = swDepth.m, col = 'blue')
 legend('topright',legend=c('Corrected','Raw'), col = c('red','blue'),
        lty = 1)
 ```
