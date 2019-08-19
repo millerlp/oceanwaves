@@ -4,7 +4,8 @@
 
 
 ## R CMD check results
-There were no ERRORs, WARNINGs or NOTEs.
+This is an initial submission. 
+There were no other ERRORs, WARNINGs, or NOTEs.
 
 
 ## Downstream dependencies

@@ -17,7 +17,8 @@ for ocean waves, using a record of surface heights as input. For sea surface
 heights
 derived from bottom-mounted pressure transducers, the package also
 contains a
-function `prCorr()` to correct for depth attenuation of the pressure signal. 
+function `prCorr()` to correct for depth attenuation of the pressure signal,
+and the `swDepth()` function from the package `oce` can be used to convert pressure data into ocean surface heights (see the included package vignette). 
 
 `waveStatsSP()` produces wave height and period statistics using spectral analysis
 methods, while `waveStatsZC()` calculates additional wave height and period
