@@ -1,6 +1,6 @@
 ## Test environments
 * local OS X install, R 3.6.1
- 
+* local Windows 10 install, R 3.6.1 
 
 
 ## R CMD check results
