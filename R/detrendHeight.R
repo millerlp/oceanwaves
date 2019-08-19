@@ -28,6 +28,7 @@
 #'  from the linear regression.
 #' 
 #' @export
+#' @importFrom stats coef lm ts
 #' @examples 
 #' data(wavedata)
 #' detrended <- detrendHeight(wavedata$swDepth.m)
