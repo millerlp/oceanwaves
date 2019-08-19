@@ -48,6 +48,7 @@
 #' data(wavedata)
 #' waveStatsZC(data = wavedata$swDepth.m, Fs = 4, plot = TRUE)
 #' @export
+#' @importFrom graphics hist
 
 waveStatsZC <- function(data, Fs, threshold = NULL, plot = FALSE){
 	# Sanity checks
