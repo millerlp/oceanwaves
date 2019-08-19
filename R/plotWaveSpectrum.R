@@ -8,6 +8,7 @@
 #' @param freqspec A data frame containing a column of frequencies 'freq' and a
 #' column of spectral power values 'spec'
 #' @param Fs Frequency of sampled surface heights, units of Hz
+#' @import ggplot2
 #' @export
 
 plotWaveSpectrum <- function(freqspec, Fs){
@@ -27,9 +28,12 @@ plotWaveSpectrum <- function(freqspec, Fs){
 # Convert the period values into frequencies. 
 	g.freqs <- 1 / g.period 
 	
-	myplot <- ggplot2::ggplot(data = subset(freqspec, freq > 1 / (maxPeriod) & 
-									freq < 1 / (minPeriod) )) + 
-			geom_path(aes(x = freq, y = spec)) + 
+	# Subset the data to the range of maxPeriod & minPeriod
+	subdata = subset(freqspec, freqspec$freq > 1 / (maxPeriod) & 
+	                   freqspec$freq < 1 / (minPeriod) )
+	
+	myplot <- ggplot2::ggplot() + 
+			geom_path(aes(x = subdata$freq, y = subdata$spec)) + 
 			scale_x_log10("Period, s", breaks = g.freqs, labels = g.labels,
 					sec.axis = sec_axis(trans = ~., breaks = g.freqs,
 							labels = format(g.freqs, dig=2, 
