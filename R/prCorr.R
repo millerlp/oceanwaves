@@ -15,6 +15,8 @@
 #' an even number.
 #' @param CorrLim [min max] frequency for attenuation correction (Hz, optional, 
 #' default [0.05 0.33], which translate to periods of 20 sec to 3 sec).
+#' @param plot Logical value TRUE or FALSE. Displays a plot of the original and 
+#' corrected time series.
 #' @return A vector of the depth-corrected surface heights (units of meters 
 #' usually). Any original trend in the input data (such as tide change) is 
 #' present in the output data. The returned surface height fluctuations will 
@@ -27,14 +29,13 @@
 #' Each segment of pt will be linearly detrended, corrected for attenuation,
 #' and the linear trend will be added back to the returned data.
 #' @export
+#' @importFrom signal hanning
+#' @importFrom graphics legend lines par
 #' @examples 
 #' data(wavedata)
 #' corrected = prCorr(wavedata$swPressure.mbar, Fs = 4, zpt = 0.1)
 #' # Plot the results
-#' plot(x = wavedata$DateTime, y = corrected, type = 'l', 
-#'  ylab='Surface Height, m', xlab = 'Time')
-#' lines(x = wavedata$DateTime, y = wavedata$swPressure.mbar, col = 'red')
-#' legend('topleft',legend=c('Corrected','Raw'),col=c('black','red'),lwd = 2)
+#' corrected = prCorr(wavedata$swPressure.mbar, Fs = 4, zpt = 0.1, plot=TRUE)
 
 prCorr <- function(pt, Fs, zpt, M = 512, CorrLim = c(0.05, 0.33), plot = FALSE ){
 	
@@ -140,12 +141,12 @@ prCorr <- function(pt, Fs, zpt, M = 512, CorrLim = c(0.05, 0.33), plot = FALSE )
 									  # shorter than M
 		}# end of if(seg_len < M)
 		
-		P <- fft(ptseg) # Calculate spectrum
+		P <- stats::fft(ptseg) # Calculate spectrum
 		Pcor <- P / Kpt # Apply correction factor
 		# The R fft(x, inverse=TRUE) function returns unnormalized series, so it
 		# is necessary to divide by length(x)
 		# The Re() function keeps only the real part of the result
-		Hseg <- Re(fft(Pcor, inverse = TRUE) / length(Pcor)) 
+		Hseg <- Re(stats::fft(Pcor, inverse = TRUE) / length(Pcor)) 
 
 		# Keep only the part that is the same length as the  original segment.
 		Hseg <- Hseg[1:seg_len] 
@@ -184,9 +185,11 @@ prCorr <- function(pt, Fs, zpt, M = 512, CorrLim = c(0.05, 0.33), plot = FALSE )
 	H <- H_with_NaN 
 	
 	if (plot) {
-		plot(x = wavedata$DateTime, y = H, type = 'l', 
+	  # Plot corrected heights
+		plot(x = 1:length(H), y = H, type = 'l', 
 				  ylab='Surface Height, m', xlab = 'Time')
-		lines(x = wavedata$DateTime, y = wavedata$SurfaceHeightRaw.m, 
+	  # Add original heights on top
+		lines(x = 1:length(pt), y = pt, 
 				col = 'red')
 		legend('topleft',legend=c('Corrected','Raw'),col=c('black','red'), 
 				lwd = 2)
