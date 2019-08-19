@@ -70,6 +70,8 @@
 #' @seealso \code{\link{waveStatsZC}} for wave statistics determined using a 
 #' zero-crossing algorithm. 
 #' @export
+#' @importFrom stats spec.pgram ts
+#' @importFrom bspec welchPSD
 #' @examples
 #' data(wavedata)
 #' waveStatsSP(wavedata$swDepth.m, Fs = 4, method = 'spec.pgram', plot = TRUE)
@@ -100,7 +102,7 @@ waveStatsSP <- function(data, Fs, method = c('welchPSD', 'spec.pgram'),
 	data <- detrended[['pt']][] # Extract vector of detrended surface heights
 	
 	# Convert timeseries of surface heights to a timeseries object
-	xt <- ts(data, frequency = Fs)
+	xt <- stats::ts(data, frequency = Fs)
 	
 	if (method == 'spec.pgram'){
 		if (is.null(kernel)){
