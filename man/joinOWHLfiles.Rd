@@ -7,10 +7,10 @@
 joinOWHLfiles(filedir, timezone = "UTC")
 }
 \arguments{
+\item{filedir}{A path to a directory containing OWHL csv files.}
+
 \item{timezone}{Specifies the time zone the raw data timestamps represent. UTC is 
 the preferred time zone for simplicity.}
-
-\item{dir}{A path to a directory containing OWHL csv files.}
 }
 \value{
 A data frame with the individual csv files concatenate together

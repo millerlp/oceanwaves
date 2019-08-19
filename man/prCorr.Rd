@@ -20,6 +20,9 @@ an even number.}
 
 \item{CorrLim}{[min max] frequency for attenuation correction (Hz, optional, 
 default [0.05 0.33], which translate to periods of 20 sec to 3 sec).}
+
+\item{plot}{Logical value TRUE or FALSE. Displays a plot of the original and 
+corrected time series.}
 }
 \value{
 A vector of the depth-corrected surface heights (units of meters 
@@ -37,10 +40,7 @@ depth of the water column and height of the sensor above the bottom.
 data(wavedata)
 corrected = prCorr(wavedata$swPressure.mbar, Fs = 4, zpt = 0.1)
 # Plot the results
-plot(x = wavedata$DateTime, y = corrected, type = 'l', 
- ylab='Surface Height, m', xlab = 'Time')
-lines(x = wavedata$DateTime, y = wavedata$swPressure.mbar, col = 'red')
-legend('topleft',legend=c('Corrected','Raw'),col=c('black','red'),lwd = 2)
+corrected = prCorr(wavedata$swPressure.mbar, Fs = 4, zpt = 0.1, plot=TRUE)
 }
 \references{
 Original MATLAB function by Urs Neumeier 
