@@ -1,6 +1,5 @@
 
 ^README\.Rmd$  # ignore README.md files, usually for github
-^notes$  # ignore the notes directory and contents
 ^\.settings$  # Eclipse project file, StatET
 ^\.git$
 ^\.project$  # Eclipse settings file 
