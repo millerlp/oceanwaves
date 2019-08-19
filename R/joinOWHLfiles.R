@@ -19,13 +19,14 @@
 #' following columns: POSIXt, DateTime, frac.seconds, Pressure.mbar, TempC
 #' 
 #' 
-#' @param dir A path to a directory containing OWHL csv files.
+#' @param filedir A path to a directory containing OWHL csv files.
 #' @param timezone Specifies the time zone the raw data timestamps represent. UTC is 
 #' the preferred time zone for simplicity.
 #' 
 #' @return A data frame with the individual csv files concatenate together
 #' 
 #' @export
+#' @importFrom utils read.csv setTxtProgressBar txtProgressBar
 
 
 joinOWHLfiles <- function(filedir, timezone = 'UTC') {
