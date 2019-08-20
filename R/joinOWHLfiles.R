@@ -39,7 +39,7 @@ joinOWHLfiles <- function(filedir, timezone = 'UTC', verbose = TRUE) {
 			nlines = 1, sep = ',')
 	
 	if (verbose) {
-	  message("Loading data files\n")
+	  message("Loading data files")
 	  pb <- txtProgressBar(min = 0, max = length(filelist), style = 3)
 	}
 	# Open the raw data files and concatenate them.
@@ -98,9 +98,7 @@ joinOWHLfiles <- function(filedir, timezone = 'UTC', verbose = TRUE) {
 	if (length(badrows)>0){
 		# Remove any rows with suspect ms values
 		dat <- dat[-badrows,]	
-		if (verbose) {
-		  message(paste('Removed',length(badrows),'suspect rows from data.\n'))
-		}
+		message('Removed ',length(badrows),' suspect rows from data.')
 	} else {
 		# do nothing if there were no bad rows
 	}
@@ -131,8 +129,9 @@ joinOWHLfiles <- function(filedir, timezone = 'UTC', verbose = TRUE) {
 	
 	nextEmptyRow <- 0 # counter variable
 	
+	
+	message("Interpolating missing seconds")
 	if (verbose) {
-	  message("Interpolating missing seconds\n")
 	  pb = txtProgressBar(min=0,max = length(shortbreaks), style = 3)
 	}
 	
