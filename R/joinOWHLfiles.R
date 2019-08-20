@@ -22,6 +22,7 @@
 #' @param filedir A path to a directory containing OWHL csv files.
 #' @param timezone Specifies the time zone the raw data timestamps represent. UTC is 
 #' the preferred time zone for simplicity.
+#' @param verbose Logical argument TRUE or FALSE, specifying if progress messages should be output. 
 #' 
 #' @return A data frame with the individual csv files concatenate together
 #' 
@@ -29,7 +30,7 @@
 #' @importFrom utils read.csv setTxtProgressBar txtProgressBar
 
 
-joinOWHLfiles <- function(filedir, timezone = 'UTC') {
+joinOWHLfiles <- function(filedir, timezone = 'UTC', verbose = TRUE) {
 	# Get a list of all of the csv files in the directory
 	filelist <- dir(filedir, pattern = '*.csv', full.names=TRUE)
 		
@@ -37,11 +38,13 @@ joinOWHLfiles <- function(filedir, timezone = 'UTC') {
 	missioninfo <- scan(filelist[1], what = character(),
 			nlines = 1, sep = ',')
 	
-	cat("Loading data files\n")
-	pb <- txtProgressBar(min = 0, max = length(filelist), style = 3)
+	if (verbose) {
+	  message("Loading data files\n")
+	  pb <- txtProgressBar(min = 0, max = length(filelist), style = 3)
+	}
 	# Open the raw data files and concatenate them.
 	for (f in 1:length(filelist)){
-		setTxtProgressBar(pb,f)
+		if (verbose){ setTxtProgressBar(pb,f) }
 		# To get the real column headers, skip the first line
 		dattemp = read.csv(filelist[f], skip = 1)
 		###########################
@@ -72,7 +75,7 @@ joinOWHLfiles <- function(filedir, timezone = 'UTC') {
 		}
 	}
 	
-	close(pb) # shut off progress bar
+	if (verbose) { close(pb) } # shut off progress bar
 	
 # Reorder the concatenated data frame by the DateTime values in case the files
 # were not fed in in chronological order
@@ -95,7 +98,9 @@ joinOWHLfiles <- function(filedir, timezone = 'UTC') {
 	if (length(badrows)>0){
 		# Remove any rows with suspect ms values
 		dat <- dat[-badrows,]	
-		cat('Removed',length(badrows),'suspect rows from data.\n')
+		if (verbose) {
+		  message(paste('Removed',length(badrows),'suspect rows from data.\n'))
+		}
 	} else {
 		# do nothing if there were no bad rows
 	}
@@ -126,14 +131,18 @@ joinOWHLfiles <- function(filedir, timezone = 'UTC') {
 	
 	nextEmptyRow <- 0 # counter variable
 	
-	cat("Interpolating missing seconds\n")
-	pb = txtProgressBar(min=0,max = length(shortbreaks), style = 3)
+	if (verbose) {
+	  message("Interpolating missing seconds\n")
+	  pb = txtProgressBar(min=0,max = length(shortbreaks), style = 3)
+	}
 	
 
 # Go through each location and insert the missing second of data (4 rows) via
 # linear interpolation of the pressure and temperature values
 	for (i in 1:length(shortbreaks)){
-		setTxtProgressBar(pb,i)
+		if (verbose) {
+		  setTxtProgressBar(pb,i)
+		}
 		if (i == 1){
 			# Grab the first chunk of good rows
 			tempdat <- dat[1:shortbreaks[i],]	
@@ -205,7 +214,9 @@ joinOWHLfiles <- function(filedir, timezone = 'UTC') {
 			
 		}
 	}
-	close(pb) # shut off progress bar
+	if (verbose) {
+	  close(pb) # shut off progress bar
+	}
 	# Finish the operation by appending the remaining good rows from dat
 	tempdat <- dat[(shortbreaks[i]+1):nrow(dat),]
 	newdat[nextEmptyRow:(nextEmptyRow + nrow(tempdat)-1),] <- tempdat
