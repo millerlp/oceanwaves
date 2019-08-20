@@ -4,13 +4,15 @@
 \alias{joinOWHLfiles}
 \title{Concatenate multiple OWHL raw csv data files}
 \usage{
-joinOWHLfiles(filedir, timezone = "UTC")
+joinOWHLfiles(filedir, timezone = "UTC", verbose = TRUE)
 }
 \arguments{
 \item{filedir}{A path to a directory containing OWHL csv files.}
 
 \item{timezone}{Specifies the time zone the raw data timestamps represent. UTC is 
 the preferred time zone for simplicity.}
+
+\item{verbose}{Logical argument TRUE or FALSE, specifying if progress messages should be output.}
 }
 \value{
 A data frame with the individual csv files concatenate together
