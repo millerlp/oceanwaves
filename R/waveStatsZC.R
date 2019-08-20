@@ -203,10 +203,10 @@ waveStatsZC <- function(data, Fs, threshold = NULL, plot = FALSE){
 			Tmean = Tmean, Tsig = Tsig)
 	
 	if (plot){
-		par(mfrow = c(2,1))
+		op <- par(mfrow = c(2,1))
 		hist(wave[,1], xlab = 'Wave height, m', main = '')
 		hist(wave[,4], xlab = 'Wave Period, s', main = '')
-		
+		par(op)  # Reset plot parameters
 	}
 
 	# Return a list object with wave statistics
