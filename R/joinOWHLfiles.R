@@ -19,7 +19,7 @@
 #' following columns: POSIXt, DateTime, frac.seconds, Pressure.mbar, TempC
 #' 
 #' 
-#' @param filedir A path to a directory containing OWHL csv files.
+#' @param filenames A vector of OWHL csv filenames, including path.
 #' @param timezone Specifies the time zone the raw data timestamps represent. UTC is 
 #' the preferred time zone for simplicity.
 #' @param verbose Logical argument TRUE or FALSE, specifying if progress messages should be output. 
@@ -30,23 +30,23 @@
 #' @importFrom utils read.csv setTxtProgressBar txtProgressBar
 
 
-joinOWHLfiles <- function(filedir, timezone = 'UTC', verbose = TRUE) {
+joinOWHLfiles <- function(filenames, timezone = 'UTC', verbose = TRUE) {
 	# Get a list of all of the csv files in the directory
-	filelist <- dir(filedir, pattern = '*.csv', full.names=TRUE)
+	# filelist <- dir(filedir, pattern = '*.csv', full.names=TRUE)
 		
 	# There is a little bit of mission info stored in the first row
-	missioninfo <- scan(filelist[1], what = character(),
+	missioninfo <- scan(filenames[1], what = character(),
 			nlines = 1, sep = ',')
 	
 	if (verbose) {
 	  message("Loading data files")
-	  pb <- txtProgressBar(min = 0, max = length(filelist), style = 3)
+	  pb <- txtProgressBar(min = 0, max = length(filenames), style = 3)
 	}
 	# Open the raw data files and concatenate them.
-	for (f in 1:length(filelist)){
+	for (f in 1:length(filenames)){
 		if (verbose){ setTxtProgressBar(pb,f) }
 		# To get the real column headers, skip the first line
-		dattemp = read.csv(filelist[f], skip = 1)
+		dattemp = read.csv(filenames[f], skip = 1)
 		###########################
 # Columns:
 # POSIXt: elapsed seconds since 1970-01-01 00:00:00 (unix epoch) in whatever
