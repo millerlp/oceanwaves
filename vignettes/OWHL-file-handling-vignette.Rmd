@@ -1,0 +1,60 @@
+---
+title: "OWHL file handling"
+author: "Luke Miller"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{OWHL file handling}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+# Introduction
+
+The `oceanwaves` package was originally created to support the post-processing workflow of the Open Wave Height Logger project. The package contains functions to assist in combining raw csv files from a OWHL device, and this vignette contains a walkthrough of the steps involved in proceeding from raw pressure data contained in an OWHL csv file to a time series of sea surface elevation data that can be used to generate oecan wave statistics. 
+
+# Starting out
+
+Begin by installing the `oceanwaves` package, if not already installed. The `oceanwaves` package makes use of several other packages that may also need to be 
+installed.
+
+```{r install, eval=FALSE}
+install.packages('oceanwaves')
+```
+
+Load the installed package.
+
+```{r setup}
+library(oceanwaves)
+```
+
+# Importing OWHL csv files
+
+The Open Wave Height Logger produces daily datafiles, in a comma-separated-value (.csv) format. Those files contain a header
+row with optional deployment information, along with a row of column headers. The import process would normally begin by generating a 
+vector of filenames (include file path) that you want to join. The
+`dir()` function can be used to generate the set of filenames.
+
+```{r getFilenames}
+filenames <- dir(FIXME, pattern = '*.csv', full.names=TRUE)
+```
+
+The set of filenames can be passed to the `joinOWHLfiles` function. 
+This function has an argument `timezone` (default `timezone = UTC`) used
+to set the time zone of the time stamps contained in the OWHL data files. If the clock of your OWHL was set to a time zone other than UTC, then supply the appropriate 
+time zone name for your clock. For example, if your OWHL clock was
+instead set to Pacific Standard Time during the deployment, you would
+set the argument as `timezone = 'etc/GMT+8'`. Verbose output for the
+file import can be turned on with the `verbose = TRUE` argument.
+
+```{r joinOWHLfiles, eval = FALSE}
+joinOWHLfiles(filenames, timezone = 'UTC',verbose = TRUE)
+```
+
+
