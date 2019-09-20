@@ -54,7 +54,115 @@ set the argument as `timezone = 'etc/GMT+8'`. Verbose output for the
 file import can be turned on with the `verbose = TRUE` argument.
 
 ```{r joinOWHLfiles, eval = FALSE}
-joinOWHLfiles(filenames, timezone = 'UTC',verbose = TRUE)
+dat = joinOWHLfiles(filenames, timezone = 'UTC',verbose = TRUE)
+```
+
+The `joinOWHLfiles` function consists of several steps:
+
+* Grab mission info (if present) from the header of the 1st csv file. This assumes that mission info is the same in all input files, which is the case if all files came from a single deployment of the OWHL.
+* Read in each csv file in a loop. 
+* The human-readable timestamp data in a csv file's DateTime column are converted to POSIXct time format with the desired time zone. 
+* The DateTime values then have the fractional seconds appended based on the values in the `frac.seconds` column of the csv file.
+* Concatenates the data from all input csv files and reorders them based on the DateTime column
+* Any suspect time values (based on the `frac.seconds` column values) are filtered and removed from the data set. 
+* Any 1 second gaps in the data set are filled by linear interpolation. These gaps arise in the raw data files when a micro SD card takes longer than the sample interval (default 0.25 seconds) to carry out its internal housekeeping routines. Longer gaps are assumed to be due to other issues and are not filled. The pressure data and temperature data
+are filled by linear interpolation from the values immediately before and after the missing second of data. 
+
+After carrying out these steps, a data frame is returned. The 
+data frame should contain the same columns as the original input csv files. 
+
+```{r headnewdata}
+head(dat)
 ```
 
 
+# Converting pressure to sea surface elevation
+
+## Removing atmospheric pressure and sensor offset
+
+The `pressure.mbar` values in the resulting data frame are absolute
+pressures in millibar. This includes the pressure signal due to 
+the air above the sea surface, which we will need to remove from the
+data in order to get only the pressure due to the column of water above the OWHL sensor. The sea level atmospheric pressure could come from a variety of sources including nearby weather stations. Ideally this would be a time series of atmospheric pressure records that aligns with the 
+OWHL time series. For this example, we will just use a single average
+value for the entire time series based on the pressure reading at the start of the deployment of 1014 mbar. 
+
+```{r atmosPressure}
+atmosPressure.mbar = 1014
+dat$swPressure.mbar = dat$Pressure.mbar - atmosPressure.mbar
+```
+
+It is also important to judge whether the OWHL sensor had any 
+pressure offset due to factors such as manufacturing variance or 
+residual pressure in the oil-filled bladder attached to the sensor (if
+used). One method to remove any offset is to compare a set of pressure
+readings from the data set while the OWHL was at the sea surface just prior deployment underwater. Ideally the value recorded by the OWHL at the ocean surface would be equivalent to the local atmospheric pressure, but any difference that exists can be removed from the entire timeseries. 
+
+Here we'll define a time value when the OWHL was known to be at the ocean surface, in the boat, just before being taken underwater. Then we
+find the row index in the `dat` data frame that is closest to that
+time stamp, and extract 10 seconds of data (40 samples at 4 Hz), and calculate the average pressure reading. This assumes that you have 
+included the data from the surface period prior to the dpeloyment, which we will remove at a later step. 
+
+```{r surfaceTime}
+# Define a surface reading for OWHL and start of subsurface deployment
+owhlSurfaceTime = as.POSIXct('2016-08-19 18:15', tz = 'UTC')
+
+# Grab an average surface pressure reading for the OWHL unit
+surfaceIndx = which.min(abs(dat$DateTime - owhlSurfaceTime))
+
+# Grab 10 seconds of surface pressure readings. This will be used to determine
+# any pressure offset in the sensor, when compared to local sea surface air
+# pressure at the time of deployment.
+surfaceOWHLPress = dat$Pressure.mbar[surfaceIndx:(surfaceIndx+40)]
+surfaceOWHLPress = round(mean(surfaceOWHLPress),dig=1)
+
+# Calculate the offset from the known sea level atmospheric pressure
+# (usally obtained from a weather station)
+offsetValue = surfaceOWHLPress - atmosPressure.mbar
+
+# Subtract offsetValue from all pressure values
+dat$swPressure.mbar = dat$swPressure.mbar - offsetValue
+
+```
+After subtracting off the atmospheric pressure and any offset from the absolute pressure values in the raw data files, we are left with the gauge pressure, the pressure due only to the water column above the pressure sensor (with the caveat that strong currents could impinge
+on a sensor port strongly enough to induce a small pressure signal that isn't due 
+purely to the pressure head above the sensor).
+
+
+
+## Subset the subsurface portion of the dataset
+
+Now would be a reasonable time to subset out only the data
+from the underwater portion of the deployment, if there are pre- and
+post-deployment data currently in the `dat` data frame. Define a 
+set of time stamps that mark when the OWHL was securely mounted in its
+fixture near the seafloor. Then use those time stamps to remove
+data before or after the deployment. 
+
+```{r deployTimes}
+# Create timestamps when the sensor was in place on the seafloor
+owhlDeployStartTime = as.POSIXct('2016-08-19 19:15', tz = 'UTC')
+owhlDeployEndTime = as.POSIXct('2016-09-27 18:15', tz = 'UTC')
+
+# Remove all surface data prior to deployment and after end
+dat = dat[dat$DateTime >= owhlDeployStartTime,]
+dat = dat[dat$DateTime <= owhlDeployEndTime,]
+```
+
+## Convert pressure to sea surface elevation
+
+To convert pressure values to sea surface elevation (height of the
+water column above the sensor), we'll use the `swDepth` function from the `oce` package. This function assumes that the input pressure data
+are in units of decibar, not millibar, so we start by converting our 
+data to decibar (just divide by 100). 
+
+```{r}
+# Convert pressure to decibar so the oce package swDepth function can be used
+dat$swPressure.dbar = dat$swPressure.mbar / 100
+
+mylatitude = 33.72 # Los Angeles
+# Use the oce function swDepth to estimate the height of seawater above the
+# sensor.
+dat$swDepth.m = oce::swDepth(dat$swPressure.dbar, latitude = mylatitude)
+
+```
