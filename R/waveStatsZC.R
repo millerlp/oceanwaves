@@ -1,11 +1,3 @@
-# Filename: waveStatsZC.R
-# Based on the function zero_crossing.m by Urs Neumeier, v 1.06
-# From http://neumeier.perso.ch/matlab/waves.html
-# 
-# 
-# Author: Luke Miller  Mar 22, 2017
-###############################################################################
-
 #' Calculate wave statistics using zero-crossing method
 #' 
 #' Calculate ocean wave summary statistics, including significant
@@ -59,8 +51,8 @@ waveStatsZC <- function(data, Fs, threshold = NULL, plot = FALSE){
 		stop('Frequency Fs must be greater than 0')
 	}
 	
-#% The function was written for zero upward-crossing. 
-#% To have zero downward-crossing (recommended) leave the next line uncommented
+# The function was written for zero upward-crossing. 
+# To have zero downward-crossing (recommended) leave the next line uncommented
 	data <- -data
 	
 	# detrendHeight function removes a linear trend and should result in a 
