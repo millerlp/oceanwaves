@@ -65,7 +65,8 @@ set the argument as `timezone = 'etc/GMT+8'`. Verbose output for the
 file import can be turned on with the `verbose = TRUE` argument.
 
 ```{r joinOWHLfiles}
-dat = joinOWHLfiles(filenames, timezone = 'UTC',verbose = TRUE)
+myTimeZone = 'UTC'
+dat = joinOWHLfiles(filenames, timezone = myTimeZone)
 ```
 
 The `joinOWHLfiles` function consists of several steps:
@@ -167,7 +168,7 @@ water column above the sensor), we'll use the `swDepth` function from the `oce` 
 are in units of decibar, not millibar, so we start by converting our 
 data to decibar (just divide by 100). 
 
-```{r}
+```{r convertPressureToSeaWater}
 # Convert pressure to decibar so the oce package swDepth function can be used
 dat$swPressure.dbar = dat$swPressure.mbar / 100
 
@@ -183,15 +184,14 @@ dat$swDepth.m = oce::swDepth(dat$swPressure.dbar, latitude = mylatitude)
 
 If your data were produced by a pressure transducer data logger mounted near the sea floor, rather than a surface buoy, the dynamic pressure signal that the data logger records will be muted to some degree depending on the depth of the data logger and the wave period. As a result, the sea surface elevation record from the bottom-mounted sensor will be an underestimate of what the actual height of the water column above the sensor was, and this underestimate gets worse as the depth of the sensor increases or the wave period gets shorter. The `oceanwaves` package provides a function `prCorr` that attempts to correct for this pressure signal attenuation and thus better recreate the actual water surface height fluctuations (a.k.a. waves).  
 
-The `prCorr` function needs a few arguments to work. In addition to the vector of sea surface elevations (in meters), you also need to provide the sampling frequency for the data logger (4 Hz in our example dataset), and the height of the data logger above the sea floor in 
-units of meters. 
+The `prCorr` function needs a few arguments to work. In addition to the vector of sea surface elevations (in meters), you also need to provide the sampling frequency `Fs` for the data logger (4 Hz in our example dataset), and the height `zpt` of the data logger above the sea floor in units of meters. 
 
 
 ```{r pressCorr}
 dat$swDepthCorrected.m = prCorr(dat$swDepth.m, Fs = 4, zpt = 0.1)
 ```
 
-We'll plot the corrected data and the uncorrected data on the same plot to show how the correction changes the estimated sea surface heights. 
+We'll plot the corrected data and the uncorrected data on the same plot to show how the correction changes the estimated sea surface elevations. 
 
 ```{r deattenuationFigure1, fig.width = 8, fig.height = 4}
 # Plot the de-attenuated data
@@ -211,10 +211,10 @@ wave statistics.
 ## Calculating wave statistics
 
 Wave statistics are generally calculated for chunks of time, often in the range of 15 to 30 minutes. If the original data were collected in 
-discrete chunks of time (such as a 15 minute burst followed by 45 minutes of no data collection) then the time series in `dat` will already have natural boundaries for each burst to be analyzed. If instead the data
-were collected continuously, it would be necessary to create our own boundaries for each chunk of time to be analyzed. Our example data set in this vignette is short, so we will just analyze the data in 5 minute chunks.
+discrete chunks of time (such as a 15 minute sampling burst followed by 45 minutes of no data collection) then the time series in `dat` will already have natural boundaries for each burst to be analyzed. If instead the data
+were collected continuously, it would be necessary to create our own boundaries for each chunk of time to be analyzed. Our example data set in this vignette is short, so we will analyze the data in 5 minute chunks.
 
-```{r}
+```{r findBounds}
 # Specify the sampling rate for this data set
 Fs = 4 # Sampling rate, Hz
 
@@ -255,31 +255,14 @@ for (i in 2:length(bounds)){
   # Using the zero-crossing function to estimate sig. wave height. 
   zcstats = oceanwaves::waveStatsZC(tempdat$swDepthCorrected.m, 
                                     Fs = Fs)
-  # Extract the period for the highest 1/3 of the waves
-  Period.zerocross = zcstats$Tsig
-  # Extract the significant wave height 
-  # (i.e. mean height of highest 1/3 of waves)
-  Hsig.zerocross = zcstats$Hsig
   ################
   # Now use the spectral analysis method instead
   spstats = oceanwaves::waveStatsSP(tempdat$swDepthCorrected.m, 
                                     Fs = Fs)
-  # Extract the significant wave height estimate
-  Hsig.spectral = spstats$Hm0 
-  # Extract the peak period estimate
-  Period.spectral = spstats$Tp
-  
-  # Stick the wave heights and periods in an output data frame 'results'
+  # Stick the wave heights and periods in lists
   if (i == 2){
-    # Create the data frame on the first loop 
-    results = data.frame(DateTime = tempDateTime,
-                         Hm0.m = Hsig.spectral,
-                         Tpeak.s = Period.spectral,
-                         Hsig.m = Hsig.zerocross,
-                         Tsig.s = Period.zerocross)
     # Add DateTime to the zerocross results
-    # TODO: Fix timezone nonsense
-    zcstats[['DateTime']] = as.POSIXct(tempDateTime,tz='UTC')
+    zcstats[['DateTime']] = tempDateTime
     # Save zerocross results as a list
     zcstatsList = zcstats 
     
@@ -289,38 +272,68 @@ for (i in 2:length(bounds)){
     spstatsList = spstats
   } else {
     # Add DateTime to zerocross results
-    zcstats[['DateTime']] = as.POSIXct(tempDateTime,tz='UTC')
+    zcstats[['DateTime']] = tempDateTime
     # Add to the zerocross list
     zcstatsList = mapply(c, zcstatsList, zcstats, SIMPLIFY=FALSE)
     # Add DateTime to the spectral results 
     spstats[['DateTime']] = tempDateTime
     spstatsList = mapply(c, spstatsList, spstats, SIMPLIFY=FALSE)
-    
-    # Extract results for this loop
-    tempresults = data.frame(DateTime = tempDateTime,
-                             Hm0.m = Hsig.spectral,
-                             Tpeak.s = Period.spectral,
-                             Hsig.m = Hsig.zerocross,
-                             Tsig.s = Period.zerocross)
-    # Append results to the results data frame
-    results = rbind(results,tempresults)
   }
 }
+  # Convert list object to data frame
+  zcstats = as.data.frame(zcstatsList)
+  # Reset time zone attribute after data frame conversion
+  attr(zcstats$DateTime,'tzone') = myTimeZone
+  # Convert list object to data frame
+  spstats = as.data.frame(spstatsList)
+  # Reset time zone attribute after data frame conversion
+  attr(spstats$DateTime,'tzone') = myTimeZone
+  # Clean up
+  rm(zcstatsList, spstatsList, tempdat,tempDateTime)
 ```
 
-The results from the analysis are shown below. Two different estimates
-of wave height and period are shown from the two different analysis
-methods. `Hm0.m` is significant wave height, in meters, and `Tpeak.s` is 
-peak period, in seconds, based on the spectral analysis method, while `Hsig.m` is significant wave height, in meters, of the highest 1/3 of the waves and `Tsig.s` is the period, in seconds, of the highest 1/3 of the waves based on the wave-by-wave analysis of the zero-crossing method.  
+The results for the spectral analysis of wave data are shown 
+below. The output includes:
 
-```{r waveResults}
-results
+* `h` - Average water depth. Same units as input surface elevations (typically meters).
+
+* `Hm0` - Significant wave height based on spectral moment 0. Same units as input surface heights (typically meters). This is approximately equal to the average height of the highest 1/3 of the waves.
+ 
+* `Tp` - Peak period, calculated as the frequency with maximum power in the power spectrum. Units of seconds.
+   
+* `m0` - Estimated variance of time series (moment 0).
+
+* `T_0_1` Average period calculated as $\frac{m0}{m1}$, units seconds. Follows National Data Buoy Center's method for average period (APD).
+ 
+* `T_0_2` Average period calculated as $(\frac{m0}{m2})^{0.5}$, units seconds. Follows Scripps Institution of Oceanography's method for calculating average period (APD) for their buoys.
+ 
+* `EPS2` Spectral width parameter.
+ 
+* `EPS4` Spectral width parameter.
+
+```{r wavespResults}
+spstats
 ```
 
-Wave climate estimates based on spectral analysis methods are probably the more commonly accepted method currently, and the wave-by-wave analysis using the zero-crossing method is provided for interested users. 
+
+Wave climate estimates based on spectral analysis methods are probably the more commonly used method, but the wave-by-wave analysis using the zero-crossing method is provided for interested users. The output statistics from the zero crossing 
+algorithm are:
+
+* `Hsig` - Mean height of the highest 1/3 of waves in the data set. Units = same as input surface elevations, usually meters.
+
+* `Hmean` - Overall mean wave height, for all waves (bigger than  threshold). Units = same as input surface elevations.
+
+* `H10` - Mean height of the upper 10% of all waves. Units = same as input surface elevations.
+
+*  `Hmax` - Maximum wave height in the input data. Units = same as input surface elevations.
+
+* `Tmean` - Mean period of all waves (bigger than threshold). Units of seconds.
+ 
+* `Tsig` - Mean period of `Hsig` (highest 1/3 of waves). Units of seconds.
 
 
-```{r}
-oceanwaves::waveStatsSP(tempdat$swDepthCorrected.m, 
-                                    Fs = Fs, plot=TRUE)
+```{r wavezcResults}
+zcstats
 ```
+
+
