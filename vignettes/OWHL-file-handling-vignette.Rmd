@@ -41,8 +41,17 @@ row with optional deployment information, along with a row of column headers. Th
 vector of filenames (include file path) that you want to join. The
 `dir()` function can be used to generate the set of filenames.
 
-```{r getFilenames}
-filenames <- dir(FIXME, pattern = '*.csv', full.names=TRUE)
+```{r, echo=FALSE}
+filenames = c(system.file("extdata","20160819_1820_00.csv",
+                          package = "oceanwaves"), 
+              system.file("extdata","20160819_1900_00.csv", 
+                          package = "oceanwaves"))
+              
+# filenames <- dir(path=, pattern = '*.csv', full.names=TRUE)
+```
+
+```{r getFilenames, eval=FALSE}
+filenames <- dir(path=".", pattern = '*.csv', full.names=TRUE)
 ```
 
 The set of filenames can be passed to the `joinOWHLfiles` function. 
@@ -53,7 +62,7 @@ instead set to Pacific Standard Time during the deployment, you would
 set the argument as `timezone = 'etc/GMT+8'`. Verbose output for the
 file import can be turned on with the `verbose = TRUE` argument.
 
-```{r joinOWHLfiles, eval = FALSE}
+```{r joinOWHLfiles}
 dat = joinOWHLfiles(filenames, timezone = 'UTC',verbose = TRUE)
 ```
 
@@ -105,7 +114,7 @@ included the data from the surface period prior to the dpeloyment, which we will
 
 ```{r surfaceTime}
 # Define a surface reading for OWHL and start of subsurface deployment
-owhlSurfaceTime = as.POSIXct('2016-08-19 18:15', tz = 'UTC')
+owhlSurfaceTime = as.POSIXct('2016-08-19 18:25', tz = 'UTC')
 
 # Grab an average surface pressure reading for the OWHL unit
 surfaceIndx = which.min(abs(dat$DateTime - owhlSurfaceTime))
@@ -141,8 +150,8 @@ data before or after the deployment.
 
 ```{r deployTimes}
 # Create timestamps when the sensor was in place on the seafloor
-owhlDeployStartTime = as.POSIXct('2016-08-19 19:15', tz = 'UTC')
-owhlDeployEndTime = as.POSIXct('2016-09-27 18:15', tz = 'UTC')
+owhlDeployStartTime = as.POSIXct('2016-08-19 18:58', tz = 'UTC')
+owhlDeployEndTime = as.POSIXct('2016-09-27 19:10', tz = 'UTC')
 
 # Remove all surface data prior to deployment and after end
 dat = dat[dat$DateTime >= owhlDeployStartTime,]
@@ -166,3 +175,33 @@ mylatitude = 33.72 # Los Angeles
 dat$swDepth.m = oce::swDepth(dat$swPressure.dbar, latitude = mylatitude)
 
 ```
+
+
+## Correcting for pressure attenuation
+
+If your data were produced by a pressure transducer data logger mounted near the sea floor, rather than a surface buoy, the dynamic pressure signal that the data logger records will be muted to some degree depending on the depth of the data logger and the wave period. As a result, the sea surface elevation record from the bottom-mounted sensor will be an underestimate of what the actual height of the water column above the sensor was, and this underestimate gets worse as the depth of the sensor increases or the wave period gets shorter. The `oceanwaves` package provides a function `prCorr` that attempts to correct for this pressure signal attenuation and thus better recreate the actual water surface height fluctuations (a.k.a. waves).  
+
+The `prCorr` function needs a few arguments to work. In addition to the vector of sea surface elevations (in meters), you also need to provide the sampling frequency for the data logger (4 Hz in our example dataset), and the height of the data logger above the sea floor in 
+units of meters. 
+
+
+```{r pressCorr}
+dat$swDepthCorrected.m = prCorr(dat$swDepth.m, Fs = 4, zpt = 0.1)
+```
+
+We'll plot the corrected data and the uncorrected data on the same plot to show how the correction changes the estimated sea surface heights. 
+
+```{r deattenuationFigure1, fig.width = 8, fig.height = 4}
+# Plot the de-attenuated data
+plot(x = dat$DateTime, 
+     y = dat$swDepthCorrected.m, type = 'l', col = 'red', 
+     ylab = 'Surface elevation, m', xlab = 'Time')
+lines(x = dat$DateTime, 
+      y = dat$swDepth.m, col = 'blue') # Add the original data
+legend('topright',legend=c('Corrected','Raw'), col = c('red','blue'),
+       lty = 1)
+```
+
+At this point, the de-attenuated sea surface elevation data in the
+`dat$swDepthCorrected.m` column could be used to calculate various
+wave statistics. 
