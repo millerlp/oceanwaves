@@ -6,7 +6,11 @@ found:
 Please always add all authors and copyright holders in the Authors@R
 field with the appropriate roles.
 
-* Pending
+* I have modifed these attributions after contacting the listed
+persons. The two persons originally listed here both
+responded that because the code in this package is not a copy of their
+original works, they did not want author attributions in this package 
+and that the citations would be sufficient. 
 
 You write information messages to the console that cannot be easily
 suppressed.
