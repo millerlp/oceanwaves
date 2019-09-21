@@ -1,20 +1,3 @@
-# Filename: waveStatsSP.R
-# 
-# Author: Luke Miller  2017-04-20, 2017
-###############################################################################
-
-
-###############################################################################
-###############################################################################
-## Function: waveStatsSP 
-
-## Spectral wave parameters from pressure transducer data (PT) after 
-## correction of the pressure attenuation (see function prCorr)
-#
-## Ported to R from MATLAB by Luke Miller 2017
-## % written by Urs Neumeier, 2003
-## % modified from Coast07.m written by T Mason, UPCE, 1999 (psd modified 7/99)
-
 #' Calculate ocean wave parameters using spectral analysis methods
 #' 
 #' Calculate ocean wave parameters using spectral analysis methods
@@ -48,16 +31,16 @@
 #'   units as input surface heights (typically meters).
 #'   This is approximately equal to the average of the highest 1/3 of the waves.
 #' 
-#'   \item \code{Tp} Peak period, calculated from Frequency at maximum of 
-#'   spectrum. Units of seconds.
+#'   \item \code{Tp} Peak period, calculated as the frequency with maximum power 
+#'   in the power spectrum. Units of seconds.
 #' 
 #'   \item \code{m0} Estimated variance of time series (moment 0).
 #' 
-#'   \item \code{T_0_1} Average period \eqn{m0/m1}, units seconds. Follows National 
+#'   \item \code{T_0_1} Average period calculated as \eqn{m0/m1}, units seconds. Follows National 
 #'   Data Buoy Center's method for average period (APD).
 #' 
-#'   \item \code{T_0_2} Average period \eqn{(m0/m2)^0.5}, units seconds. Follows 
-#'   Scripps Institute of Oceanography's method for calculating average period 
+#'   \item \code{T_0_2} Average period calculated as \eqn{(m0/m2)^0.5}, units seconds. Follows 
+#'   Scripps Institution of Oceanography's method for calculating average period 
 #'   (APD) for their buoys.
 #' 
 #'   \item \code{EPS2} Spectral width parameter.
@@ -66,7 +49,8 @@
 #' }
 #' 
 #' @references Original MATLAB function by Urs Neumeier:  
-#' http://neumeier.perso.ch/matlab/waves.html
+#' http://neumeier.perso.ch/matlab/waves.html, based on code developed by Travis 
+#' Mason, Magali Lecouturier and Urs Neumeier.
 #' @seealso \code{\link{waveStatsZC}} for wave statistics determined using a 
 #' zero-crossing algorithm. 
 #' @export
