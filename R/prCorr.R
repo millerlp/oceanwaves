@@ -1,4 +1,3 @@
-
 #' Correct for depth attenuation of a water surface height 
 #' pressure signal. 
 #' 
