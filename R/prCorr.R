@@ -7,8 +7,8 @@
 #' function corrects water surface height time series based on the
 #' depth of the water column and height of the sensor above the bottom.
 #' 
-#' @param pt A vector of water surface heights (units of meters usually).
-#' @param Fs Sampling frequency (units of Hz). Normally 4Hz for an OWHL logger.
+#' @param pt A vector of sea surface elevations (units of meters).
+#' @param Fs Sampling frequency (units of Hz). Normally 4 Hz for an OWHL logger.
 #' @param zpt Height of the pressure sensor above the seabed (units of meters).
 #' @param M Length of time series segments that will be used in the detrending
 #' and attenuation correction operations. 512 samples is the default, should be
@@ -21,9 +21,8 @@
 #' usually). Any original trend in the input data (such as tide change) is 
 #' present in the output data. The returned surface height fluctuations will 
 #' typically be more extreme than the raw input surface heights. 
-#' @references Original MATLAB function by Urs Neumeier 
-#' http://neumeier.perso.ch/matlab/waves.html Modified from the Pcorr3.m 
-#' function written by T. Mason, SOC, January 1997
+#' @references Based on original MATLAB function by developed by Travis Mason, 
+#' M. Lecouturier & Urs Neumeier http://neumeier.perso.ch/matlab/waves.html 
 #' 
 #' 
 #' Each segment of pt will be linearly detrended, corrected for attenuation,
