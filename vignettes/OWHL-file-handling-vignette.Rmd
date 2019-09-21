@@ -4,8 +4,10 @@ author: "Luke Miller"
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{OWHL file handling}
-  %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
+  %\VignetteEngine{knitr::rmarkdown}
+editor_options: 
+  chunk_output_type: console
 ---
 
 ```{r, include = FALSE}
@@ -203,5 +205,96 @@ legend('topright',legend=c('Corrected','Raw'), col = c('red','blue'),
 ```
 
 At this point, the de-attenuated sea surface elevation data in the
-`dat$swDepthCorrected.m` column could be used to calculate various
+`dat$swDepthCorrected.m` column can be used to calculate various
 wave statistics. 
+
+## Calculating wave statistics
+
+Wave statistics are generally calculated for chunks of time, often in the range of 15 to 30 minutes. If the original data were collected in 
+discrete chunks of time (such as a 15 minute burst followed by 45 minutes of no data collection) then the time series in `dat` will already have natural boundaries for each burst to be analyzed. If instead the data
+were collected continuously, it would be necessary to create our own boundaries for each chunk of time to be analyzed. Our example data set in this vignette is short, so we will just analyze the data in 5 minute chunks.
+
+```{r}
+# Specify the sampling rate for this data set
+Fs = 4 # Sampling rate, Hz
+
+# Search for existing natural breaks in the data set. Use the
+# sampling rate to determine where longer breaks exist
+bounds = which(diff(dat$DateTime) > (1/Fs))
+
+if (length(bounds) > 0){
+  # If there are natural breaks in the time series, use the 
+  # values in bounds 
+  bounds = c(0,bounds) # Add on the first row index as well
+  # We use 0 rather than 1 here to accomodate processing in the 
+  # code below
+} else if (length(bounds) == 0){
+  # If bounds has length 0, the dataset is continuous
+  # Define how long you want each analyzed time chunk to be
+  timeChunk = 5 # units of minutes
+  # Calculate the number of rows in a time chunk
+  stepSize = timeChunk * 60 * Fs #  minutes x 60 seconds x sample rate
+  # Generate a set of chunk boundaries based on stepSize
+  bounds = seq(from = 0, to = nrow(dat), by = stepSize)
+} 
+```
+
+After defining a vector `bounds` containing row indices in the 
+`dat` data frame to be analyzed as separate time chunks, step through the time chunks.
+
+```{r processTimeChunks}
+# Go through each time chunk and calculate the significant wave
+# height of the de-trended data (removing tide signal). Calculate the peak
+# wave period as well. 
+# A 5 minute chunk at 4Hz should be 1200 rows
+
+# pb = txtProgressBar(min=0,max = length(bounds), style = 3)
+
+for (i in 2:length(bounds)){
+  # Extract the chunk of contiguous data
+  tempdat = dat[((bounds[i-1])+1):bounds[i],]
+  # Extract the date & time at the end of the chunk
+  tempDateTime = tempdat[nrow(tempdat),'DateTime']
+  
+  # Using the zero-crossing function to estimate sig. wave height. 
+  zcstats = oceanwaves::waveStatsZC(tempdat$swDepthCorrected.m, 
+                                    Fs = Fs)
+  # Extract the peak period
+  Period.zerocross = zcstats$Tsig
+  # Extract the significant wave height
+  Hsig.zerocross = zcstats$Hsig
+  ####
+  # Now use the spectral analysis method instead
+  spstats = oceanwaves::waveStatsSP(tempdat$swDepthCorrected.m, 
+                                    Fs = Fs)
+  # Extract the significant wave height estimate
+  Hsig.spectral = spstats$Hm0 
+  # Extract the peak period estimate
+  Period.spectral = spstats$Tp
+  
+  # Stick the wave heights and periods in an output data frame 'results'
+  if (i == 2){
+    # Create the data frame on the first loop 
+    results = data.frame(DateTime = tempDateTime,
+                         Period.zerocross = Period.zerocross,
+                         Hsig.zerocross = Hsig.zerocross,
+                         Period.spectral = Period.spectral,
+                         Hsig.spectral = Hsig.spectral)
+  } else {
+    # Append new rows onto the data frame
+    tempresults = data.frame(DateTime = tempDateTime,
+                             Period.zerocross = Period.zerocross,
+                             Hsig.zerocross = Hsig.zerocross,
+                             Period.spectral = Period.spectral,
+                             Hsig.spectral = Hsig.spectral)
+    results = rbind(results,tempresults)
+  }
+  # setTxtProgressBar(pb,i) # update text progress bar
+  
+}
+# close(pb)
+```
+
+```{r}
+results
+```
