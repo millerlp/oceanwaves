@@ -243,12 +243,8 @@ After defining a vector `bounds` containing row indices in the
 `dat` data frame to be analyzed as separate time chunks, step through the time chunks.
 
 ```{r processTimeChunks}
-# Go through each time chunk and calculate the significant wave
-# height of the de-trended data (removing tide signal). Calculate the peak
-# wave period as well. 
-# A 5 minute chunk at 4Hz should be 1200 rows
-
-# pb = txtProgressBar(min=0,max = length(bounds), style = 3)
+# Go through each time chunk and calculate the wave
+# height and period of the de-trended data (removing tide signal).
 
 for (i in 2:length(bounds)){
   # Extract the chunk of contiguous data
@@ -259,11 +255,12 @@ for (i in 2:length(bounds)){
   # Using the zero-crossing function to estimate sig. wave height. 
   zcstats = oceanwaves::waveStatsZC(tempdat$swDepthCorrected.m, 
                                     Fs = Fs)
-  # Extract the peak period
+  # Extract the period for the highest 1/3 of the waves
   Period.zerocross = zcstats$Tsig
-  # Extract the significant wave height
+  # Extract the significant wave height 
+  # (i.e. mean height of highest 1/3 of waves)
   Hsig.zerocross = zcstats$Hsig
-  ####
+  ################
   # Now use the spectral analysis method instead
   spstats = oceanwaves::waveStatsSP(tempdat$swDepthCorrected.m, 
                                     Fs = Fs)
@@ -276,25 +273,54 @@ for (i in 2:length(bounds)){
   if (i == 2){
     # Create the data frame on the first loop 
     results = data.frame(DateTime = tempDateTime,
-                         Period.zerocross = Period.zerocross,
-                         Hsig.zerocross = Hsig.zerocross,
-                         Period.spectral = Period.spectral,
-                         Hsig.spectral = Hsig.spectral)
+                         Hm0.m = Hsig.spectral,
+                         Tpeak.s = Period.spectral,
+                         Hsig.m = Hsig.zerocross,
+                         Tsig.s = Period.zerocross)
+    # Add DateTime to the zerocross results
+    # TODO: Fix timezone nonsense
+    zcstats[['DateTime']] = as.POSIXct(tempDateTime,tz='UTC')
+    # Save zerocross results as a list
+    zcstatsList = zcstats 
+    
+    # Add DateTime to the spectral results 
+    spstats[['DateTime']] = tempDateTime
+    # Save spectral results as a list
+    spstatsList = spstats
   } else {
-    # Append new rows onto the data frame
+    # Add DateTime to zerocross results
+    zcstats[['DateTime']] = as.POSIXct(tempDateTime,tz='UTC')
+    # Add to the zerocross list
+    zcstatsList = mapply(c, zcstatsList, zcstats, SIMPLIFY=FALSE)
+    # Add DateTime to the spectral results 
+    spstats[['DateTime']] = tempDateTime
+    spstatsList = mapply(c, spstatsList, spstats, SIMPLIFY=FALSE)
+    
+    # Extract results for this loop
     tempresults = data.frame(DateTime = tempDateTime,
-                             Period.zerocross = Period.zerocross,
-                             Hsig.zerocross = Hsig.zerocross,
-                             Period.spectral = Period.spectral,
-                             Hsig.spectral = Hsig.spectral)
+                             Hm0.m = Hsig.spectral,
+                             Tpeak.s = Period.spectral,
+                             Hsig.m = Hsig.zerocross,
+                             Tsig.s = Period.zerocross)
+    # Append results to the results data frame
     results = rbind(results,tempresults)
   }
-  # setTxtProgressBar(pb,i) # update text progress bar
-  
 }
-# close(pb)
 ```
 
-```{r}
+The results from the analysis are shown below. Two different estimates
+of wave height and period are shown from the two different analysis
+methods. `Hm0.m` is significant wave height, in meters, and `Tpeak.s` is 
+peak period, in seconds, based on the spectral analysis method, while `Hsig.m` is significant wave height, in meters, of the highest 1/3 of the waves and `Tsig.s` is the period, in seconds, of the highest 1/3 of the waves based on the wave-by-wave analysis of the zero-crossing method.  
+
+```{r waveResults}
 results
+```
+
+Wave climate estimates based on spectral analysis methods are probably the more commonly accepted method currently, and the wave-by-wave analysis using the zero-crossing method is provided for interested users. 
+
+
+```{r}
+oceanwaves::waveStatsSP(tempdat$swDepthCorrected.m, 
+                                    Fs = Fs, plot=TRUE)
 ```
