@@ -46,7 +46,7 @@ joinOWHLfiles <- function(filenames, timezone = 'UTC', verbose = TRUE) {
 	for (f in 1:length(filenames)){
 		if (verbose){ setTxtProgressBar(pb,f) }
 		# To get the real column headers, skip the first line
-		dattemp = read.csv(filenames[f], skip = 1)
+		dattemp <- read.csv(filenames[f], skip = 1)
 		###########################
 # Columns:
 # POSIXt: elapsed seconds since 1970-01-01 00:00:00 (unix epoch) in whatever
@@ -106,120 +106,132 @@ joinOWHLfiles <- function(filenames, timezone = 'UTC', verbose = TRUE) {
 # If there are brief breaks in the data (1 second) due to SD card write issues
 # then it would be nice to interpolate those to fill them and be able to use
 # the whole chunk of time. 
-	startMin <- as.numeric(missioninfo[3])
-	minperhr <- as.numeric(missioninfo[5])
-	bounds <- which(diff(dat$DateTime)>0.25 ) # Find all breaks > 0.25 seconds
-	bounds2 <- which(diff(dat$DateTime)>1.25) # Find all breaks > 1.25 seconds
+	bounds <- which(diff(dat$DateTime) > 0.25 ) # Find all breaks > 0.25 seconds
+	bounds2 <- which(diff(dat$DateTime) > 1.25) # Find all breaks > 1.25 seconds
 	
 # Define a function to find entries in bounds that aren't in bounds2
 	"%w/o%" <- function(x, y) x[!x %in% y] #--  x without y
 # Get a vector of indices in dat where the next time step is missing 1 second
 	shortbreaks <- bounds %w/o% bounds2
 	
-# Determine the length of the new data frame with the added interpolated rows
-	newlength <- nrow(dat) + (length(shortbreaks) * 4)
-# Allocate the new data frame
-	newdat <- data.frame(POSIXt = numeric(length = newlength),
-			DateTime = numeric(length=newlength),
-			frac.seconds = integer(length=newlength),
-			Pressure.mbar = numeric(length = newlength),
-			TempC = numeric(length = newlength))
-	newdat$DateTime <- as.POSIXct(newdat$DateTime, origin = '1970-1-1', 
-			tz = timezone)
-	
-	nextEmptyRow <- 0 # counter variable
-	
-	
-	message("Interpolating missing seconds")
-	if (verbose) {
-	  pb = txtProgressBar(min=0,max = length(shortbreaks), style = 3)
+	# If there are missing time steps of 1 second, proceed with filling them
+	if (length(shortbreaks) > 0) {
+	  # Determine the length of the new data frame with the added interpolated rows
+	  newlength <- nrow(dat) + (length(shortbreaks) * 4)
+	  # Allocate the new data frame
+	  newdat <- data.frame(
+	    POSIXt = numeric(length = newlength),
+	    DateTime = numeric(length = newlength),
+	    frac.seconds = integer(length = newlength),
+	    Pressure.mbar = numeric(length = newlength),
+	    TempC = numeric(length = newlength)
+	  )
+	  newdat$DateTime <-
+	    as.POSIXct(newdat$DateTime, origin = '1970-1-1',
+	               tz = timezone)
+	  
+	  nextEmptyRow <- 0 # counter variable
+	  
+	  
+	  message("Interpolating missing seconds")
+	  if (verbose) {
+	    pb <- txtProgressBar(min = 0,
+	                        max = length(shortbreaks),
+	                        style = 3)
+	  }
+	  
+	  
+	  # Go through each location and insert the missing second of data (4 rows) via
+	  # linear interpolation of the pressure and temperature values
+	  for (i in 1:length(shortbreaks)) {
+	    if (verbose) {
+	      setTxtProgressBar(pb, i)
+	    }
+	    if (i == 1) {
+	      # Grab the first chunk of good rows
+	      tempdat <- dat[1:shortbreaks[i], ]
+	      # Get the next 4 good rows after the skip
+	      afterskip <- dat[(shortbreaks[i] + 1):(shortbreaks[i] + 4), ]
+	      # Get record of last good pressure + temp, and next good pressure + temp
+	      beforePress <- tempdat$Pressure.mbar[nrow(tempdat)]
+	      afterPress <- afterskip$Pressure.mbar[1]
+	      beforeTempC <- tempdat$TempC[nrow(tempdat)]
+	      afterTempC <- afterskip$TempC[1]
+	      # Fit a linear model to the pressure values
+	      presslm <- coef(lm(c(beforePress, afterPress) ~ c(1, 6)))
+	      xs <- seq(2, 5)
+	      # Interpolate the 4 missing values
+	      interpPress <- (xs * presslm[2]) + presslm[1]
+	      # Do the same routine for temperature
+	      templm <- coef(lm(c(beforeTempC, afterTempC) ~ c(1, 6)))
+	      interpTempC <- (xs * templm[2]) + templm[1]
+	      
+	      afterskip2 <- afterskip
+	      afterskip2$POSIXt <- afterskip2$POSIXt - 1
+	      afterskip2$DateTime <- afterskip2$DateTime - 1
+	      afterskip2$Pressure.mbar <- interpPress
+	      afterskip2$TempC <- interpTempC
+	      
+	      # Add the missing 4 rows to newdat
+	      newdat[1:(shortbreaks[1]), ] <-
+	        tempdat  # First copy over the good data
+	      newdat[(shortbreaks[1] + 1):(shortbreaks[1] + 4),] <- afterskip2
+	      # Update the nextEmptyRow to the first empty row in newdat
+	      nextEmptyRow <- shortbreaks[1] + 5
+	      
+	      # Move on to the 2nd entry in shortbreaks, which should get added to
+	      # the newdat data frame
+	    } else {
+	      # Grab the next chunk of good rows
+	      tempdat <- dat[(shortbreaks[i - 1] + 1):shortbreaks[i], ]
+	      # Get the next 4 good rows after the skip
+	      afterskip <- dat[(shortbreaks[i] + 1):(shortbreaks[i] + 4), ]
+	      # Get record of last good pressure + temp, and next good pressure + temp
+	      beforePress <- tempdat$Pressure.mbar[nrow(tempdat)]
+	      afterPress <- afterskip$Pressure.mbar[1]
+	      beforeTempC <- tempdat$TempC[nrow(tempdat)]
+	      afterTempC <- afterskip$TempC[1]
+	      # Fit a linear model to the pressure values
+	      presslm <- coef(lm(c(beforePress, afterPress) ~ c(1, 6)))
+	      xs <- seq(2, 5)
+	      # Interpolate the 4 missing values
+	      interpPress <- (xs * presslm[2]) + presslm[1]
+	      # Do the same routine for temperature
+	      templm <- coef(lm(c(beforeTempC, afterTempC) ~ c(1, 6)))
+	      interpTempC <- (xs * templm[2]) + templm[1]
+	      
+	      afterskip2 <- afterskip
+	      afterskip2$POSIXt <- afterskip2$POSIXt - 1
+	      afterskip2$DateTime <- afterskip2$DateTime - 1
+	      afterskip2$Pressure.mbar <- interpPress
+	      afterskip2$TempC <- interpTempC
+	      
+	      # Add the good data to newdat. The value of nextEmptyRow currently
+	      # should hold the 1st empty row of newdat, and we want to add on
+	      # all of the good rows in tempdat.
+	      newdat[nextEmptyRow:(nextEmptyRow + nrow(tempdat) - 1),] <-
+	        tempdat
+	      # Update nextEmptyRow now that new data have been inserted
+	      nextEmptyRow <- nextEmptyRow + (nrow(tempdat))
+	      # Add the interpolated rows in as well
+	      newdat[(nextEmptyRow):(nextEmptyRow + 3), ] <- afterskip2
+	      # Update the row counter to the current empty row of newdat
+	      nextEmptyRow <- nextEmptyRow + 4
+	      
+	    }
+	  }
+	  
+	  if (verbose) {
+	    close(pb) # shut off progress bar
+	    message('Filled ',i,' one second gaps')
+	  }
+	  # Finish the operation by appending the remaining good rows from dat
+	  tempdat <- dat[(shortbreaks[i] + 1):nrow(dat), ]
+	  newdat[nextEmptyRow:(nextEmptyRow + nrow(tempdat) - 1), ] <- tempdat
+	} else {
+	  # If there were no 1 second gaps, just return a copy of dat
+	  newdat <- dat
 	}
-	
-
-# Go through each location and insert the missing second of data (4 rows) via
-# linear interpolation of the pressure and temperature values
-	for (i in 1:length(shortbreaks)){
-		if (verbose) {
-		  setTxtProgressBar(pb,i)
-		}
-		if (i == 1){
-			# Grab the first chunk of good rows
-			tempdat <- dat[1:shortbreaks[i],]	
-			# Get the next 4 good rows after the skip
-			afterskip <- dat[(shortbreaks[i]+1):(shortbreaks[i]+4),]
-			# Get record of last good pressure + temp, and next good pressure + temp
-			beforePress <- newdat$Pressure.mbar[nrow(tempdat)]
-			afterPress <- afterskip$Pressure.mbar[1]
-			beforeTempC <- newdat$TempC[nrow(tempdat)]
-			afterTempC <- afterskip$TempC[1]
-			# Fit a linear model to the pressure values
-			presslm <- coef(lm(c(beforePress,afterPress)~c(1,6)))
-			xs <- seq(2,5)
-			# Interpolate the 4 missing values
-			interpPress <- (xs*presslm[2]) + presslm[1]
-			# Do the same routine for temperature
-			templm <- coef(lm(c(beforeTempC,afterTempC)~c(1,6)))
-			interpTempC <- (xs*templm[2]) + templm[1]
-			
-			afterskip2 <- afterskip
-			afterskip2$POSIXt <- afterskip2$POSIXt - 1
-			afterskip2$DateTime <- afterskip2$DateTime - 1
-			afterskip2$Pressure.mbar <- interpPress
-			afterskip2$TempC <- interpTempC
-			
-			# Add the missing 4 rows to newdat
-			newdat[1:(shortbreaks[1]),] <- tempdat  # First copy over the good data
-			newdat[(shortbreaks[1]+1) : (shortbreaks[1]+4), ] <- afterskip2
-			# Update the nextEmptyRow to the first empty row in newdat
-			nextEmptyRow <- shortbreaks[1]+5
-			
-			# Move on to the 2nd entry in shortbreaks, which should get added to 
-			# the newdat data frame
-		} else {
-			# Grab the next chunk of good rows
-			tempdat <- dat[(shortbreaks[i-1]+1):shortbreaks[i],]
-			# Get the next 4 good rows after the skip
-			afterskip <- dat[(shortbreaks[i]+1):(shortbreaks[i]+4),]
-			# Get record of last good pressure + temp, and next good pressure + temp
-			beforePress <- tempdat$Pressure.mbar[nrow(tempdat)]
-			afterPress <- afterskip$Pressure.mbar[1]
-			beforeTempC <- tempdat$TempC[nrow(tempdat)]
-			afterTempC <- afterskip$TempC[1]
-			# Fit a linear model to the pressure values
-			presslm <- coef(lm(c(beforePress,afterPress)~c(1,6)))
-			xs <- seq(2,5)
-			# Interpolate the 4 missing values
-			interpPress <- (xs*presslm[2]) + presslm[1]
-			# Do the same routine for temperature
-			templm <- coef(lm(c(beforeTempC,afterTempC)~c(1,6)))
-			interpTempC <- (xs*templm[2]) + templm[1]
-			
-			afterskip2 <- afterskip
-			afterskip2$POSIXt <- afterskip2$POSIXt - 1
-			afterskip2$DateTime <- afterskip2$DateTime - 1
-			afterskip2$Pressure.mbar <- interpPress
-			afterskip2$TempC <- interpTempC
-			
-			# Add the good data to newdat. The value of nextEmptyRow currently
-			# should hold the 1st empty row of newdat, and we want to add on
-			# all of the good rows in tempdat.
-			newdat[nextEmptyRow : (nextEmptyRow + nrow(tempdat)-1), ] <- tempdat
-			# Update nextEmptyRow now that new data have been inserted
-			nextEmptyRow <- nextEmptyRow + (nrow(tempdat))
-			# Add the interpolated rows in as well
-			newdat[(nextEmptyRow) : (nextEmptyRow + 3),] <- afterskip2
-			# Update the row counter to the current empty row of newdat
-			nextEmptyRow <- nextEmptyRow + 4
-			
-		}
-	}
-	if (verbose) {
-	  close(pb) # shut off progress bar
-	}
-	# Finish the operation by appending the remaining good rows from dat
-	tempdat <- dat[(shortbreaks[i]+1):nrow(dat),]
-	newdat[nextEmptyRow:(nextEmptyRow + nrow(tempdat)-1),] <- tempdat
-	
 	# Return newdat
 	newdat
 }
