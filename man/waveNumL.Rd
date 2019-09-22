@@ -20,7 +20,7 @@ A function to calculate wave number.
 \references{
 Modified from MATLAB function by Urs Neumeier:  
 http://neumeier.perso.ch/matlab/waves.html
-}
-\author{
-George Voulgaris, SUDO, 1992
+Based on polynomial approximation from Hunt, J. N. 1979. “Direct Solution of 
+Wave Dispersion Equation,” ASCE Jour. Waterw., Port, Coastal and Ocean Engr.,
+Vol 105, pp 457-459 suggested by George Voulgaris, University of South Carolina
 }

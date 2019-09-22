@@ -40,16 +40,16 @@ List of wave parameters based on spectral methods.
   units as input surface heights (typically meters).
   This is approximately equal to the average of the highest 1/3 of the waves.
 
-  \item \code{Tp} Peak period, calculated from Frequency at maximum of 
-  spectrum. Units of seconds.
+  \item \code{Tp} Peak period, calculated as the frequency with maximum power 
+  in the power spectrum. Units of seconds.
 
   \item \code{m0} Estimated variance of time series (moment 0).
 
-  \item \code{T_0_1} Average period \eqn{m0/m1}, units seconds. Follows National 
+  \item \code{T_0_1} Average period calculated as \eqn{m0/m1}, units seconds. Follows National 
   Data Buoy Center's method for average period (APD).
 
-  \item \code{T_0_2} Average period \eqn{(m0/m2)^0.5}, units seconds. Follows 
-  Scripps Institute of Oceanography's method for calculating average period 
+  \item \code{T_0_2} Average period calculated as \eqn{(m0/m2)^0.5}, units seconds. Follows 
+  Scripps Institution of Oceanography's method for calculating average period 
   (APD) for their buoys.
 
   \item \code{EPS2} Spectral width parameter.
@@ -71,7 +71,8 @@ waveStatsSP(wavedata$swDepth.m, Fs = 4, method = 'spec.pgram', plot = TRUE)
 }
 \references{
 Original MATLAB function by Urs Neumeier:  
-http://neumeier.perso.ch/matlab/waves.html
+http://neumeier.perso.ch/matlab/waves.html, based on code developed by Travis 
+Mason, Magali Lecouturier and Urs Neumeier.
 }
 \seealso{
 \code{\link{waveStatsZC}} for wave statistics determined using a 
