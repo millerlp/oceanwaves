@@ -185,7 +185,7 @@ prCorr <- function(pt, Fs, zpt, M = 512, CorrLim = c(0.05, 0.33), plot = FALSE )
 	if (plot) {
 	  # Plot corrected heights
 		plot(x = 1:length(H), y = H, type = 'l', 
-				  ylab='Surface Height, m', xlab = 'Time')
+				  ylab='Surface elevation, m', xlab = 'Time')
 	  # Add original heights on top
 		lines(x = 1:length(pt), y = pt, 
 				col = 'red')
