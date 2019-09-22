@@ -6,7 +6,9 @@ found:
 Please always add all authors and copyright holders in the Authors@R
 field with the appropriate roles.
 
-* Pending
+* I have modifed these attributions after contacting the listed
+persons. These persons are now listed in the DESCRIPTION file
+as contributors.
 
 You write information messages to the console that cannot be easily
 suppressed.

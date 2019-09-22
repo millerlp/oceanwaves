@@ -8,9 +8,9 @@ pressure signal.}
 prCorr(pt, Fs, zpt, M = 512, CorrLim = c(0.05, 0.33), plot = FALSE)
 }
 \arguments{
-\item{pt}{A vector of water surface heights (units of meters usually).}
+\item{pt}{A vector of sea surface elevations (units of meters).}
 
-\item{Fs}{Sampling frequency (units of Hz). Normally 4Hz for an OWHL logger.}
+\item{Fs}{Sampling frequency (units of Hz). Normally 4 Hz for an OWHL logger.}
 
 \item{zpt}{Height of the pressure sensor above the seabed (units of meters).}
 
@@ -43,9 +43,8 @@ corrected = prCorr(wavedata$swPressure.mbar, Fs = 4, zpt = 0.1)
 corrected = prCorr(wavedata$swPressure.mbar, Fs = 4, zpt = 0.1, plot=TRUE)
 }
 \references{
-Original MATLAB function by Urs Neumeier 
-http://neumeier.perso.ch/matlab/waves.html Modified from the Pcorr3.m 
-function written by T. Mason, SOC, January 1997
+Based on original MATLAB function by developed by Travis Mason, 
+M. Lecouturier & Urs Neumeier http://neumeier.perso.ch/matlab/waves.html 
 
 
 Each segment of pt will be linearly detrended, corrected for attenuation,
