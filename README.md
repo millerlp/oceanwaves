@@ -1,6 +1,8 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
+[![DOI](https://zenodo.org/badge/85914597.svg)](https://zenodo.org/badge/latestdoi/85914597)
+
 `oceanwaves` provides a set of functions to calculate summary statistics
 for ocean waves, using a record of sea surface elevation as input. For
 sea surface elevations derived from bottom-mounted pressure transducers,
