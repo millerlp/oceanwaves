@@ -32,10 +32,12 @@ par(oldpar)
 ## Test environments
 * local OS X install, R 3.6.1
 * local Windows 10 install, R 3.6.1 
+* Windows via http://win-builder.r-project.org/ R Under development (unstable) (2019-09-20 r77199)
+* Windows via http://win-builder.r-project.org/ R version 3.6.1 (2019-07-05)
 
 
 ## R CMD check results
-This is an initial submission. 
+NOTE: This is an initial submission. 
 There were no other ERRORs, WARNINGs, or NOTEs.
 
 
