@@ -84,14 +84,15 @@
     
     
 <!-- README.md is generated from README.Rmd. Please edit that file -->
-<p><code>oceanwaves</code> provides a set of functions to calculate summary statistics for ocean waves, using a record of surface heights as input. For sea surface heights derived from bottom-mounted pressure transducers, the package also contains a function <code><a href="reference/prCorr.html">prCorr()</a></code> to correct for depth attenuation of the pressure signal, and the <code>swDepth()</code> function from the package <code>oce</code> can be used to convert pressure data into ocean surface heights (see the included package vignette).</p>
+
+<p><code>oceanwaves</code> provides a set of functions to calculate summary statistics for ocean waves, using a record of sea surface elevation as input. For sea surface elevations derived from bottom-mounted pressure transducers, the package also contains a function <code><a href="reference/prCorr.html">prCorr()</a></code> to correct for depth attenuation of the pressure signal, and the <code>swDepth()</code> function from the package <code>oce</code> can be used to convert pressure data into ocean surface elevations (see the included package vignette).</p>
 <p><code><a href="reference/waveStatsSP.html">waveStatsSP()</a></code> produces wave height and period statistics using spectral analysis methods, while <code><a href="reference/waveStatsZC.html">waveStatsZC()</a></code> calculates additional wave height and period statistics based on a zero-crossing algorithm.</p>
-<p>An additional function <code>joinOWHLfiles</code> is provided to concatenate and clean csv files from an Open Wave Height Logger pressure data logger, to prepare the data for analysis with the functions described above. See the package vignettes for example workflows to proceed from raw pressure data csv files to summary wave statistics.</p>
+<p>See the package vignette for example workflows to proceed from raw pressure data to summary wave statistics.</p>
 <p>Pressure corrections and wave statistics functions were adapted from Urs Neumeier’s <code>waves</code> functions for MATLAB, developed from earlier work by Travis Mason and Magali Lecouturier. <a href="http://neumeier.perso.ch/matlab/waves.html">http://neumeier.perso.ch/matlab/waves.html</a></p>
-<p>To install this package from within R, first install the package <code>devtools</code> <a href="https://CRAN.R-project.org/package=devtools">https://CRAN.R-project.org/package=devtools</a> and then install this package from Github:</p>
+<p>To install the development version of this package from within R, first install the package <code>devtools</code> <a href="https://CRAN.R-project.org/package=devtools">https://CRAN.R-project.org/package=devtools</a> and then install this package from Github:</p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" data-line-number="1"><span class="kw"><a href="https://www.rdocumentation.org/packages/utils/topics/install.packages">install.packages</a></span>(<span class="st">'devtools'</span>)</a>
 <a class="sourceLine" id="cb1-2" data-line-number="2"><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/library">library</a></span>(devtools)</a>
-<a class="sourceLine" id="cb1-3" data-line-number="3"><span class="kw"><a href="https://www.rdocumentation.org/packages/devtools/topics/reexports">install_github</a></span>(<span class="st">'millerlp/oceanwaves'</span>)</a></code></pre></div>
+<a class="sourceLine" id="cb1-3" data-line-number="3"><span class="kw"><a href="https://www.rdocumentation.org/packages/devtools/topics/remote-reexports">install_github</a></span>(<span class="st">'millerlp/oceanwaves'</span>)</a></code></pre></div>
   </div>
 
   <div class="col-md-3 hidden-xs hidden-sm" id="sidebar">
@@ -125,7 +126,14 @@
 </ul>
 </div>
 
-      </div>
+
+      <div class="dev-status">
+<h2>Dev status</h2>
+<ul class="list-unstyled">
+<li><a href="https://zenodo.org/badge/latestdoi/85914597"><img src="https://zenodo.org/badge/85914597.svg" alt="DOI"></a></li>
+</ul>
+</div>
+</div>
 
 </div>
 
