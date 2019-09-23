@@ -16,7 +16,7 @@ knitr::opts_chunk$set(
 
 # Introduction
 
-The `oceanwaves` package is primarily designed to estimate several summary statistics,including significant wave height and period, from a time series of fluctuating sea surface elevation data. The package also provides methods for dealing with data from bottom-mounted pressure transducers, including a function for correcting the pressure signal attenuation that affects sea surface elevations derived from pressure data collected in deeper waters.
+The `oceanwaves` package is primarily designed to estimate several summary statistics, including significant wave height and period, from a time series of fluctuating sea surface elevation data. The package also provides methods for dealing with data from bottom-mounted pressure transducers, including a function for correcting the pressure signal attenuation that affects sea surface elevations derived from pressure data collected in deeper waters.
 
 This vignette will make use of an included data set `wavedata` provided with the `oceanwaves` package. The first portion of the vignette will deal with handling raw pressure data from a bottom-mounted pressure transducer data logger, and the later portion will illustrate how to generate wave height and period estimates once you have a time series of sea surface elevation data. 
 
