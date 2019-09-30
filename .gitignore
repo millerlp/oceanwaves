@@ -54,3 +54,5 @@ Temporary Items
 *.settings
 .Rproj.user
 inst/doc
+
+.Rhistory
