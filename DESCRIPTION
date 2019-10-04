@@ -22,11 +22,14 @@ Authors@R:
              family = 'Voulgaris', 
              role = 'ctb'))
 Description: Calculate ocean wave height summary statistics and process data 
-    from bottom-mounted pressure sensor data loggers. Wave number calculation 
-    based on the algorithm in Hunt, J. N. (1979, ISSN:0148-9895) "Direct 
-    Solution of Wave Dispersion Equation," American Society of Civil Engineers 
-    Journal of the Waterway, Port, Coastal, and Ocean Division, Vol 105, pp 457-459.
-URL: https://github.com/millerlp/oceanwaves,  https://millerlp.github.io/oceanwaves/
+    from bottom-mounted pressure sensor data loggers. Derived primarily from 
+    MATLAB functions provided by U. Neumeier at 
+    <http://neumeier.perso.ch/matlab/waves.html>. Wave number 
+    calculation based on the algorithm in Hunt, J. N. (1979, ISSN:0148-9895) 
+    "Direct Solution of Wave Dispersion Equation", American Society of Civil 
+    Engineers Journal of the Waterway, Port, Coastal, and Ocean Division, 
+    Vol 105, pp 457-459.
+URL: https://github.com/millerlp/oceanwaves, https://millerlp.github.io/oceanwaves/
 BugReports: https://github.com/millerlp/oceanwaves/issues
 Depends:
     R (>= 3.3.0),
