@@ -196,6 +196,7 @@ waveStatsZC <- function(data, Fs, threshold = NULL, plot = FALSE){
 	
 	if (plot){
 		op <- par(mfrow = c(2,1))
+		on.exit(expr = par(op))
 		hist(wave[,1], xlab = 'Wave height, m', main = '')
 		hist(wave[,4], xlab = 'Wave Period, s', main = '')
 		par(op)  # Reset plot parameters
