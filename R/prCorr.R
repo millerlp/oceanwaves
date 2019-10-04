@@ -209,7 +209,7 @@ prCorr <- function(pt, Fs, zpt, M = 512, CorrLim = c(0.05, 0.33), plot = FALSE )
 #' @references Modified from MATLAB function by Urs Neumeier:  
 #' http://neumeier.perso.ch/matlab/waves.html
 #' Based on polynomial approximation from Hunt, J. N. 1979. “Direct Solution of 
-#' Wave Dispersion Equation,” ASCE Jour. Waterw., Port, Coastal and Ocean Engr.,
+#' Wave Dispersion Equation,” ASCE Journal of the Waterway, Port, Coastal and Ocean Division.,
 #' Vol 105, pp 457-459 suggested by George Voulgaris, University of South Carolina
 
 waveNumL <- function(f, h) {
