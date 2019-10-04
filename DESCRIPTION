@@ -2,8 +2,30 @@ Package: oceanwaves
 Title: Ocean Wave Statistics
 Version: 0.1.0
 Date: 2019-09-22
-Authors@R: c(person("Luke", "Miller", email= "contact@lukemiller.org", role = c("aut","cre")),person("Urs","Neumeier", email = "urs_neumeier@uqar.ca", role = "aut"),person("Travis","Mason", role = 'ctb'),person('Magali', 'Lecouturier', role = 'ctb'),person('George','Voulgaris', role = 'ctb'))
-Description: Calculate ocean wave height summary statistics and process data from bottom-mounted pressure sensor data loggers.
+Authors@R: 
+    c(person(given = "Luke", 
+             family = "Miller", 
+             email= "contact@lukemiller.org", 
+             role = c("aut","cre"),
+             comment = c(ORCID = "0000-0002-2009-6981")),
+      person(given = "Urs",
+             family = "Neumeier", 
+             email = "urs_neumeier@uqar.ca", 
+             role = "aut"),
+      person(given = "Travis",
+             family = "Mason", 
+             role = 'ctb'),
+      person(given = 'Magali', 
+             family = 'Lecouturier', 
+             role = 'ctb'),
+      person(given = 'George',
+             family = 'Voulgaris', 
+             role = 'ctb'))
+Description: Calculate ocean wave height summary statistics and process data 
+    from bottom-mounted pressure sensor data loggers. Wave number calculation 
+    based on the algorithm in Hunt, J. N. (1979, ISSN:0148-9895) "Direct 
+    Solution of Wave Dispersion Equation," American Society of Civil Engineers 
+    Journal of the Waterway, Port, Coastal, and Ocean Division, Vol 105, pp 457-459.
 URL: https://github.com/millerlp/oceanwaves,  https://millerlp.github.io/oceanwaves/
 BugReports: https://github.com/millerlp/oceanwaves/issues
 Depends:
