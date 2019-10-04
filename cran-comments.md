@@ -1,33 +1,30 @@
 ## Resubmission
 
-found:
-"function written by T. Mason"
-"author George Voulgaris"
-Please always add all authors and copyright holders in the Authors@R
-field with the appropriate roles.
+If there are references describing the methods in your package, please 
+add these in the description field of your DESCRIPTION file in the form
+authors (year) <doi:...>
+authors (year) <arXiv:...>
+authors (year, ISBN:...)
+or if those are not available: <https:...>
+with no space after 'doi:', 'arXiv:', 'https:' and angle brackets for 
+auto-linking.
 
-* I have modifed these attributions after contacting the listed
-persons. These persons are now listed in the DESCRIPTION file
-as contributors.
-
-You write information messages to the console that cannot be easily
-suppressed.
-Instead of print()/cat() rather use message()/warning() or
-if(verbose)cat(..) if you really have to write text to the console.
-f.i.: joinOWHLfiles()
-
-* I have modified joinOWHLfiles() to add a @param verbose to allow the
-user to suppress txtProgressBar and messages. cat() functions have been converted to message(). 
+* I have added a citation in the DESCRIPTION Description field for a reference to a method used in the package. The reference is old (1979) and not archived online, so I cannot provide a doi link. Instead I have substituted the journal's ISSN number in the format suggested as "authors (year, ISBN:...)" in hopes that this is sufficient information.
 
 
-Please always make sure to reset to user's options, wd or par after you
-changed it in examples and vignettes.
-F.i: vignette:
-oldpar <- par(mfrow = c(1,2))
+Please make sure that you do not change the user's options, par or 
+working directory. If you really have to do so, please ensure with an 
+*immediate* call of on.exit() that the settings are reset when the 
+function is exited, similar to this:
 ...
-par(oldpar)
+oldpar <- par(mfrow = c(1,2)) #line i
+on.exit(par(oldpar)) #line i+1
+...
+f.i.: waveStatsZC.R
 
-* I have modified the function waveStatsZC() to reset user's par options after plotting. This should also correct the identified issue in the vignette.
+* I have added the suggested on.exit() call to waveStatsZC.R on the line immediately after the existing par() call. 
+
+
 
 ## Test environments
 * local OS X install, R 3.6.1
