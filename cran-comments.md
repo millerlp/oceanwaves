@@ -9,7 +9,13 @@ or if those are not available: <https:...>
 with no space after 'doi:', 'arXiv:', 'https:' and angle brackets for 
 auto-linking.
 
-* I have added a citation in the DESCRIPTION Description field for a reference to a method used in the package. The reference is old (1979) and not archived online, so I cannot provide a doi link. Instead I have substituted the journal's ISSN number in the format suggested as "authors (year, ISBN:...)" in hopes that this is sufficient information.
+* In the DESCRIPTION Description field I have added a <http:> link to the 
+original MATLAB functions by package co-author U. Neumeier. I have also added a 
+citation for a reference to a method used in the package in the prCorr.R file. 
+The reference is old (1979) and not archived online, so I cannot provide a doi 
+link. Instead I have substituted the journal's ISSN number in the format 
+suggested as "authors (year, ISBN:...)" in hopes that this is sufficient 
+information.
 
 
 Please make sure that you do not change the user's options, par or 
@@ -29,13 +35,25 @@ f.i.: waveStatsZC.R
 ## Test environments
 * local OS X install, R 3.6.1
 * local Windows 10 install, R 3.6.1 
-* Windows via http://win-builder.r-project.org/ R Under development (unstable) (2019-09-20 r77199)
-* Windows via http://win-builder.r-project.org/ R version 3.6.1 (2019-07-05)
+* Windows 10 via http://win-builder.r-project.org/ R Under development (unstable) (2019-09-20 r77199)
+* Windows 10 via http://win-builder.r-project.org/ R version 3.6.1 (2019-07-05)
+* Ubuntu Linux 16.04 LTS, R-release, GCC via https://builder.r-hub.io
+* Fedora Linux, R-devel, clang, gfortran, via https://builder.r-hub.io
+
 
 
 ## R CMD check results
-NOTE: This is an initial submission. 
-There were no other ERRORs, WARNINGs, or NOTEs.
+There were no ERRORs or WARNINGs
+
+There were 2 NOTEs:
+
+* NOTE: This is an initial submission. 
+
+* NOTE: Possibly mis-spelled words in DESCRIPTION:
+  ISSN (28:62)
+  Neumeier (26:37)
+
+I have checked the spelling of the words and they are spelled correctly.
 
 
 ## Downstream dependencies
