@@ -11,11 +11,11 @@ auto-linking.
 
 * In the DESCRIPTION Description field I have added a <http:> link to the 
 original MATLAB functions by package co-author U. Neumeier. I have also added a 
-citation for a reference to a method used in the package in the prCorr.R file. 
+citation for a reference to a method used in the prCorr.R file. 
 The reference is old (1979) and not archived online, so I cannot provide a doi 
 link. Instead I have substituted the journal's ISSN number in the format 
-suggested as "authors (year, ISBN:...)" in hopes that this is sufficient 
-information.
+suggested as "authors (year, ISBN:...)" and the full citation in hopes that this
+is sufficient information.
 
 
 Please make sure that you do not change the user's options, par or 
