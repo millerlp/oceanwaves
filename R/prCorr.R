@@ -1,9 +1,9 @@
-#' Correct for depth attenuation of a water surface height 
+#' Correct for depth attenuation of a water surface elevation 
 #' pressure signal. 
 #' 
 #' Bottom-mounted pressure transducers suffer from pressure signal 
 #' attenuation when attempting to estimate surface wave heights. This 
-#' function corrects water surface height time series based on the
+#' function corrects water surface elevation time series based on the
 #' depth of the water column and height of the sensor above the bottom.
 #' 
 #' @param pt A vector of sea surface elevations (units of meters).
@@ -16,10 +16,10 @@
 #' default [0.05 0.33], which translate to periods of 20 sec to 3 sec).
 #' @param plot Logical value TRUE or FALSE. Displays a plot of the original and 
 #' corrected time series.
-#' @return A vector of the depth-corrected surface heights (units of meters 
+#' @return A vector of the depth-corrected surface elevations (units of meters 
 #' usually). Any original trend in the input data (such as tide change) is 
-#' present in the output data. The returned surface height fluctuations will 
-#' typically be more extreme than the raw input surface heights. 
+#' present in the output data. The returned surface elevation fluctuations will 
+#' typically be more extreme than the raw input surface elevations. 
 #' @references Based on original MATLAB function by developed by Travis Mason, 
 #' M. Lecouturier & Urs Neumeier http://neumeier.perso.ch/matlab/waves.html 
 #' 
