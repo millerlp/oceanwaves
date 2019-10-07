@@ -1,6 +1,6 @@
 Package: oceanwaves
 Title: Ocean Wave Statistics
-Version: 0.1.0
+Version: 0.1.9000
 Date: 2019-09-22
 Authors@R: 
     c(person(given = "Luke", 
