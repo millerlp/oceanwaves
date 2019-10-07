@@ -9,10 +9,10 @@ citEntry(entry = "Manual",
                    as.person("Urs Neumeier")),
   year         = year,
   note         = note,
-  url          = "https://github.com/millerlp/oceanwaves",
+  url          = "https://cran.r-project.org/package=oceanwaves",
 
   textVersion  =
   paste("Luke P. Miller and Urs Neumeier (",year,").",
         "oceanwaves: Ocean Wave Statistics",
-        "https://github.com/millerlp/oceanwaves")
+        "https://cran.r-project.org/package=oceanwaves")
 )
