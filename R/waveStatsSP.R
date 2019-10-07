@@ -39,7 +39,7 @@
 #'   \item \code{T_0_1} Average period calculated as \eqn{m0/m1}, units seconds. Follows National 
 #'   Data Buoy Center's method for average period (APD).
 #' 
-#'   \item \code{T_0_2} Average period calculated as \eqn{(m0/m2)^0.5}, units seconds. Follows 
+#'   \item \code{T_0_2} Average period calculated as \eqn{(m0/m2)^{0.5}}, units seconds. Follows 
 #'   Scripps Institution of Oceanography's method for calculating average period 
 #'   (APD) for their buoys.
 #' 
