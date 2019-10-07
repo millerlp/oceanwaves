@@ -23,6 +23,14 @@ Neumeier’s `waves` functions for MATLAB, developed from earlier work by
 Travis Mason and Magali Lecouturier.
 <http://neumeier.perso.ch/matlab/waves.html>
 
+The release version of this package can be obtained from
+<https://cran.r-project.org/package=oceanwaves>. To install this package
+within R, do the following at the R command line:
+
+``` r
+install.packages('oceanwaves')
+```
+
 To install the development version of this package from within R, first
 install the package `devtools`
 <https://CRAN.R-project.org/package=devtools> and then install this
