@@ -7,8 +7,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Oceanwaves vignette • oceanwaves</title>
 <!-- jquery --><script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script><!-- Bootstrap --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha256-916EbMg70RQy9LHiGkXzG8hSg9EdNy97GazNG/aiY1w=" crossorigin="anonymous">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha256-U5ZEeKfGNOja007MMD3YBI0A3OSZOQbeG6z2f2Y0hu8=" crossorigin="anonymous"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" integrity="sha256-eZrrJcwDc/3uDhsdt61sL2oOBY362qM3lon1gyExkL0=" crossorigin="anonymous">
-<!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.4/clipboard.min.js" integrity="sha256-FiZwavyI2V6+EXO1U+xzLG3IKldpiTFf3153ea9zikQ=" crossorigin="anonymous"></script><!-- sticky kit --><script src="https://cdnjs.cloudflare.com/ajax/libs/sticky-kit/1.1.3/sticky-kit.min.js" integrity="sha256-c4Rlo1ZozqTPE2RLuvbusY3+SU1pQaJC0TjuhygMipw=" crossorigin="anonymous"></script><!-- pkgdown --><link href="../pkgdown.css" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha256-U5ZEeKfGNOja007MMD3YBI0A3OSZOQbeG6z2f2Y0hu8=" crossorigin="anonymous"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.7.1/css/all.min.css" integrity="sha256-nAmazAk6vS34Xqo0BSrTb+abbtFlgsFK7NKSi6o7Y78=" crossorigin="anonymous">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.7.1/css/v4-shims.min.css" integrity="sha256-6qHlizsOWFskGlwVOKuns+D1nB6ssZrHQrNj1wGplHc=" crossorigin="anonymous">
+<!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.4/clipboard.min.js" integrity="sha256-FiZwavyI2V6+EXO1U+xzLG3IKldpiTFf3153ea9zikQ=" crossorigin="anonymous"></script><!-- headroom.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.9.4/headroom.min.js" integrity="sha256-DJFC1kqIhelURkuza0AvYal5RxMtpzLjFhsnVIeuk+U=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.9.4/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script><!-- pkgdown --><link href="../pkgdown.css" rel="stylesheet">
 <script src="../pkgdown.js"></script><meta property="og:title" content="Oceanwaves vignette">
 <meta property="og:description" content="">
 <meta name="twitter:card" content="summary">
@@ -30,7 +31,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">oceanwaves</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.1.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.1.9000</span>
       </span>
     </div>
 
@@ -38,7 +39,7 @@
       <ul class="nav navbar-nav">
 <li>
   <a href="../index.html">
-    <span class="fa fa-home fa-lg"></span>
+    <span class="fas fa fas fa-home fa-lg"></span>
      
   </a>
 </li>
@@ -64,7 +65,7 @@
 <ul class="nav navbar-nav navbar-right">
 <li>
   <a href="https://github.com/millerlp/oceanwaves">
-    <span class="fa fa-github fa-lg"></span>
+    <span class="fab fa fab fa-github fa-lg"></span>
      
   </a>
 </li>
@@ -77,6 +78,7 @@
 <!--/.navbar -->
 
       
+
       </header><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
@@ -100,22 +102,22 @@
 <h1 class="hasAnchor">
 <a href="#starting-out" class="anchor"></a>Starting out</h1>
 <p>Begin by installing the package, if not already installed. The <code>oceanwaves</code> package makes use of several other packages that may also need to be installed.</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" data-line-number="1"><span class="kw"><a href="https://www.rdocumentation.org/packages/utils/topics/install.packages">install.packages</a></span>(<span class="st">'oceanwaves'</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" title="1"><span class="kw"><a href="https://rdrr.io/r/utils/install.packages.html">install.packages</a></span>(<span class="st">'oceanwaves'</span>)</a></code></pre></div>
 <p>Load the installed package.</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb2-1" data-line-number="1"><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/library">library</a></span>(oceanwaves)</a>
-<a class="sourceLine" id="cb2-2" data-line-number="2"><span class="co">#&gt; Loading required package: ggplot2</span></a></code></pre></div>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb2-1" title="1"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span>(oceanwaves)</a>
+<a class="sourceLine" id="cb2-2" title="2"><span class="co">#&gt; Loading required package: ggplot2</span></a></code></pre></div>
 <p>Load the provided <code>wavedata</code> data frame.</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb3-1" data-line-number="1"><span class="kw"><a href="https://www.rdocumentation.org/packages/utils/topics/data">data</a></span>(wavedata)</a></code></pre></div>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb3-1" title="1"><span class="kw"><a href="https://rdrr.io/r/utils/data.html">data</a></span>(wavedata)</a></code></pre></div>
 <p>The loaded data frame contains 7200 records of 4 variables.</p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb4-1" data-line-number="1"><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/options">options</a></span>(<span class="dt">digits.sec =</span> <span class="dv">3</span>)  <span class="co"># print fractional seconds</span></a>
-<a class="sourceLine" id="cb4-2" data-line-number="2"><span class="kw"><a href="https://www.rdocumentation.org/packages/utils/topics/head">head</a></span>(wavedata)</a>
-<a class="sourceLine" id="cb4-3" data-line-number="3"><span class="co">#&gt;                   DateTime absPressure.mbar swPressure.mbar swDepth.m</span></a>
-<a class="sourceLine" id="cb4-4" data-line-number="4"><span class="co">#&gt; 277201 2016-08-19 19:15:00           2063.3          1049.3  10.41813</span></a>
-<a class="sourceLine" id="cb4-5" data-line-number="5"><span class="co">#&gt; 277202 2016-08-19 19:15:00           2065.5          1051.5  10.43998</span></a>
-<a class="sourceLine" id="cb4-6" data-line-number="6"><span class="co">#&gt; 277203 2016-08-19 19:15:00           2067.8          1053.8  10.46281</span></a>
-<a class="sourceLine" id="cb4-7" data-line-number="7"><span class="co">#&gt; 277204 2016-08-19 19:15:00           2070.4          1056.4  10.48863</span></a>
-<a class="sourceLine" id="cb4-8" data-line-number="8"><span class="co">#&gt; 277205 2016-08-19 19:15:01           2071.8          1057.8  10.50253</span></a>
-<a class="sourceLine" id="cb4-9" data-line-number="9"><span class="co">#&gt; 277206 2016-08-19 19:15:01           2074.6          1060.6  10.53033</span></a></code></pre></div>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb4-1" title="1"><span class="kw"><a href="https://rdrr.io/r/base/options.html">options</a></span>(<span class="dt">digits.sec =</span> <span class="dv">3</span>)  <span class="co"># print fractional seconds</span></a>
+<a class="sourceLine" id="cb4-2" title="2"><span class="kw"><a href="https://rdrr.io/r/utils/head.html">head</a></span>(wavedata)</a>
+<a class="sourceLine" id="cb4-3" title="3"><span class="co">#&gt;                   DateTime absPressure.mbar swPressure.mbar swDepth.m</span></a>
+<a class="sourceLine" id="cb4-4" title="4"><span class="co">#&gt; 277201 2016-08-19 19:15:00           2063.3          1049.3  10.41813</span></a>
+<a class="sourceLine" id="cb4-5" title="5"><span class="co">#&gt; 277202 2016-08-19 19:15:00           2065.5          1051.5  10.43998</span></a>
+<a class="sourceLine" id="cb4-6" title="6"><span class="co">#&gt; 277203 2016-08-19 19:15:00           2067.8          1053.8  10.46281</span></a>
+<a class="sourceLine" id="cb4-7" title="7"><span class="co">#&gt; 277204 2016-08-19 19:15:00           2070.4          1056.4  10.48863</span></a>
+<a class="sourceLine" id="cb4-8" title="8"><span class="co">#&gt; 277205 2016-08-19 19:15:01           2071.8          1057.8  10.50253</span></a>
+<a class="sourceLine" id="cb4-9" title="9"><span class="co">#&gt; 277206 2016-08-19 19:15:01           2074.6          1060.6  10.53033</span></a></code></pre></div>
 <p>The columns are:</p>
 <ul>
 <li>
@@ -132,13 +134,13 @@
 <h1 class="hasAnchor">
 <a href="#converting-raw-pressure-data-to-sea-surface-elevation" class="anchor"></a>Converting raw pressure data to sea surface elevation</h1>
 <p>We’ll start by showing the process of moving from absolute pressure recorded by a bottom-mounted pressure transducer into a time series of sea surface elevations. The first step is to remove the pressure signal due to the atmosphere above the water surface, so that we can get a proper estimate of the height (or depth, depending on your perspective) of the water column. Because air pressure changes with the weather, obtaining a record of local sea level air pressure from a weather station will be useful. For the example data set, we will assume the air pressure was a constant 1014 mbar (as recorded by a local airport weather station), and subtract that value from each of the absolute pressure values in the data set (effectively recreating the values in the <code>swPressure.mbar</code>) column.</p>
-<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb5-1" data-line-number="1">surfacepressure.mbar =<span class="st"> </span>wavedata<span class="op">$</span>absPressure.mbar <span class="op">-</span><span class="st"> </span><span class="dv">1014</span></a></code></pre></div>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb5-1" title="1">surfacepressure.mbar =<span class="st"> </span>wavedata<span class="op">$</span>absPressure.mbar <span class="op">-</span><span class="st"> </span><span class="dv">1014</span></a></code></pre></div>
 <p>This would also be an opportunity to subtract off any offset in the pressure transducer dataset that might be due to other factors, such as drift in the transducer’s baseline value (i.e. if the transducer didn’t read exactly 1014 mbar at the sea surface when the known sea surface air pressure was 1014 mbar).</p>
 <p>With the pressure due to the seawater alone calculated, we then want to convert pressure values into estimates of sea surface elevation so that they represent the physical height of the wave crests and troughs passing over the pressure transducer. The conversion from pressure to water column height relies on a few factors, most notably the water column temperature, since the density of the water above the pressure transducer will affect the recorded pressure. There’s also potential effects of salinity (water with more salt in it will be more dense and produce a higher pressure signal also), and even local gravity. Those values can vary through the water column and make for a very complicated calculation of the conversion from pressure to depth. However, the slight differences in calculated sea surface elevation that might come from precisely knowing temperature and salinity throughout the water column when converting pressure to water column height probably aren’t enough to radically bias our estimates of the height of the waves passing over the site during the short window of time typically used to estimated wave statistics (15-30 minutes). For our purposes, we will make use of a conversion function provided by the <code>oce</code> package, which is a dependency of the <code>oceanwaves</code> package and should already be installed. This conversion function, <code>swDepth</code>, assumes a constant temperature and salinity for the water column.</p>
 <p>The <code>oce</code> package assumes that the pressure readings are in <em>deci</em>bar rather than <em>milli</em>bar, so we first need to convert to dbar by dividing mbar by 100.</p>
-<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb6-1" data-line-number="1">surfacepressure.dbar =<span class="st"> </span>surfacepressure.mbar <span class="op">/</span><span class="st"> </span><span class="dv">100</span></a></code></pre></div>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb6-1" title="1">surfacepressure.dbar =<span class="st"> </span>surfacepressure.mbar <span class="op">/</span><span class="st"> </span><span class="dv">100</span></a></code></pre></div>
 <p>We then call the <code>swDepth</code> function from the <code>oce</code> package. This function needs the latitude of the sampling site when you supply pressure data. The example data were collected near Los Angeles, California, so we’ll use 33.75<span class="math inline">\(\circ\)</span> as the latitude. The output depth will be in units of meters.</p>
-<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb7-1" data-line-number="1">swDepth.m =<span class="st"> </span>oce<span class="op">::</span><span class="kw"><a href="https://www.rdocumentation.org/packages/oce/topics/swDepth">swDepth</a></span>(surfacepressure.dbar, <span class="dt">latitude =</span> <span class="fl">33.75</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb7-1" title="1">swDepth.m =<span class="st"> </span>oce<span class="op">::</span><span class="kw"><a href="https://rdrr.io/pkg/oce/man/swDepth.html">swDepth</a></span>(surfacepressure.dbar, <span class="dt">latitude =</span> <span class="fl">33.75</span>)</a></code></pre></div>
 </div>
 <div id="pressure-attenuation-correction" class="section level1">
 <h1 class="hasAnchor">
@@ -146,15 +148,15 @@
 <p>If your sea surface elevation data were produced by a pressure transducer data logger mounted near the sea floor, rather than a surface buoy, the dynamic pressure signal that the data logger records will be muted to some degree depending on the depth of the data logger and the wave period. As a result, the water surface elevation record from the bottom-mounted sensor will be an underestimate of what the actual height of the water column was, and this underestimate gets worse as the depth of the sensor increases or the wave period gets shorter. The <code>oceanwaves</code> package provides a function <code>prCorr</code> that attempts to correct for this pressure signal attenuation and thus better recreate the actual water surface height fluctuations (a.k.a. waves). See Denny (1988) pg 61 and pgs 296-297 for a relatively simple explanation of the attenuation effect.</p>
 <p>The <code>prCorr</code> function needs a few arguments to work. In addition to the vector of sea surface elevations (in meters), you also need to provide the sampling frequency for the data logger (4 Hz in our <code>wavedata</code> example dataset), and the height of the data logger above the sea floor.</p>
 <p>Why does that height above the bottom matter? As a wave moves into shallower water, it begins to “feel” the bottom, which is what causes a wave to peak and break. The motion of water particles in the water column will be impacted by the interaction of the wave with the bottom, transitioning from nearly circular orbits near the surface to ellipsoidal orbits near the sea floor. This change in the orbital motion of the water particles affects the dynamic pressure signal recorded by the data logger. But a data logger need not always be mounted directly on the sea floor, such as the case of a data logger strapped to a pier piling in the middle of the water column rather than at the bottom. The degree to which a wave “feels” the seafloor is a function of the wavelength and depth of the water column, and the resulting modification of water particle motions depends on where in the water column a water particle is. For this reason, it is important to know where in the water column the pressure sensor sat, relative to the full depth of the water column at that site. In the case of our example <code>wavedata</code>, the pressure sensor was situated 10 cm above the seafloor, so we provide this value, in meters, as the <code>zpt</code> argument.</p>
-<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb8-1" data-line-number="1">swDepthCorrected.m =<span class="st"> </span><span class="kw"><a href="../reference/prCorr.html">prCorr</a></span>(swDepth.m, <span class="dt">Fs =</span> <span class="dv">4</span>, <span class="dt">zpt =</span> <span class="fl">0.1</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb8-1" title="1">swDepthCorrected.m =<span class="st"> </span><span class="kw"><a href="../reference/prCorr.html">prCorr</a></span>(swDepth.m, <span class="dt">Fs =</span> <span class="dv">4</span>, <span class="dt">zpt =</span> <span class="fl">0.1</span>)</a></code></pre></div>
 <p>We’ll plot the corrected data and the uncorrected data on the same plot to show how the correction changes the estimated sea surface elevations.</p>
-<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb9-1" data-line-number="1"><span class="kw"><a href="https://www.rdocumentation.org/packages/graphics/topics/plot">plot</a></span>(swDepthCorrected.m, <span class="dt">type =</span> <span class="st">'l'</span>, <span class="dt">col =</span> <span class="st">'red'</span>, </a>
-<a class="sourceLine" id="cb9-2" data-line-number="2">     <span class="dt">ylab =</span> <span class="st">'Surface elevation, m'</span>)</a>
-<a class="sourceLine" id="cb9-3" data-line-number="3"><span class="kw"><a href="https://www.rdocumentation.org/packages/graphics/topics/lines">lines</a></span>(swDepth.m, <span class="dt">col =</span> <span class="st">'blue'</span>)</a>
-<a class="sourceLine" id="cb9-4" data-line-number="4"><span class="kw"><a href="https://www.rdocumentation.org/packages/graphics/topics/legend">legend</a></span>(<span class="st">'topright'</span>,<span class="dt">legend=</span><span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(<span class="st">'Corrected'</span>,<span class="st">'Raw'</span>), <span class="dt">col =</span> <span class="kw"><a href="https://www.rdocumentation.org/packages/base/topics/c">c</a></span>(<span class="st">'red'</span>,<span class="st">'blue'</span>),</a>
-<a class="sourceLine" id="cb9-5" data-line-number="5">       <span class="dt">lty =</span> <span class="dv">1</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb9-1" title="1"><span class="kw"><a href="https://rdrr.io/r/graphics/plot.html">plot</a></span>(swDepthCorrected.m, <span class="dt">type =</span> <span class="st">'l'</span>, <span class="dt">col =</span> <span class="st">'red'</span>, </a>
+<a class="sourceLine" id="cb9-2" title="2">     <span class="dt">ylab =</span> <span class="st">'Surface elevation, m'</span>)</a>
+<a class="sourceLine" id="cb9-3" title="3"><span class="kw"><a href="https://rdrr.io/r/graphics/lines.html">lines</a></span>(swDepth.m, <span class="dt">col =</span> <span class="st">'blue'</span>)</a>
+<a class="sourceLine" id="cb9-4" title="4"><span class="kw"><a href="https://rdrr.io/r/graphics/legend.html">legend</a></span>(<span class="st">'topright'</span>,<span class="dt">legend=</span><span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">'Corrected'</span>,<span class="st">'Raw'</span>), <span class="dt">col =</span> <span class="kw"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">'red'</span>,<span class="st">'blue'</span>),</a>
+<a class="sourceLine" id="cb9-5" title="5">       <span class="dt">lty =</span> <span class="dv">1</span>)</a></code></pre></div>
 <p><img src="oceanwaves-vignette_files/figure-html/unnamed-chunk-2-1.png" width="768"></p>
-<p>As the comparison figure shows, the correction in surface elevation is not a trivial amount, and will substantially impact your estimates of surface wave heights. The <code>prCorr</code> function also has an argument <code>CorrLim</code> with defaults of <code><a href="https://www.rdocumentation.org/packages/base/topics/c">c(0.05, 0.33)</a></code> that specifies what range of wave frequencies the correction should be applied to. A frequency of 0.05 equals a wave period of 20 seconds, and a frequency of 0.33 equals a wave period of 3 seconds. These values are given as reasonable defaults for ocean waves, but you may have cause to change them depending on the circumstances of your pressure sensor data logger deployment. For instance, pressure sensors deployed in deeper water will not adequately register high frequency wind waves, so it may be desirable to change the upper limit from 0.33 Hz to a smaller value (= longer period).</p>
+<p>As the comparison figure shows, the correction in surface elevation is not a trivial amount, and will substantially impact your estimates of surface wave heights. The <code>prCorr</code> function also has an argument <code>CorrLim</code> with defaults of <code><a href="https://rdrr.io/r/base/c.html">c(0.05, 0.33)</a></code> that specifies what range of wave frequencies the correction should be applied to. A frequency of 0.05 equals a wave period of 20 seconds, and a frequency of 0.33 equals a wave period of 3 seconds. These values are given as reasonable defaults for ocean waves, but you may have cause to change them depending on the circumstances of your pressure sensor data logger deployment. For instance, pressure sensors deployed in deeper water will not adequately register high frequency wind waves, so it may be desirable to change the upper limit from 0.33 Hz to a smaller value (= longer period).</p>
 <p>You may also notice the declining trend in the mean elevation of the sea surface. This is due to the falling tide during this collection interval. The pressure attenuation correction in <code><a href="../reference/prCorr.html">prCorr()</a></code> removes this trend when it estimates the mean water depth for purposes of the correction, and the calculations of wave statistics below also remove this trend before attempting to calculate the wave heights and periods.</p>
 </div>
 <div id="calculating-wave-statistics" class="section level1">
@@ -166,25 +168,25 @@
 <a href="#wave-statistics-using-a-zero-crossing-algorithm" class="anchor"></a>Wave statistics using a zero-crossing algorithm</h2>
 <p>A zero-crossing algorithm for determining wave height and wave length should be relatively intuitive. If you want to describe the height of waves, and how often they come by, you can just establish what the still water level would be, and then measure the height and length of each wave based on when (and how high) the water level rises above the still water level (the start of a wave), then drops below, and finally rises above the still water level again (the end of the wave, and start of the next wave). If you start each wave as it rises above the still water level, this is an ‘up-crossing’ algorithm. Similarly, you could do the same routine, but start counting each wave when the water drops below the still water level instead, which is referred to as a ‘down-crossing’ algorithm. Using a zero-crossing algorithm (both up-crossing and down-crossing versions) is also referred to as wave-by-wave analysis or wave train analysis.</p>
 <p>The <code>oceanwaves</code> package implements an down-crossing algorithm in the function <code>waveStatsZC</code>, which should be supplied with a vector of water surface heights and the sampling frequency of the data (4 Hz for our example <code>wavedata</code>).</p>
-<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb10-1" data-line-number="1">zerocrossStats =<span class="st"> </span><span class="kw"><a href="../reference/waveStatsZC.html">waveStatsZC</a></span>(swDepthCorrected.m, <span class="dt">Fs =</span> <span class="dv">4</span>)</a>
-<a class="sourceLine" id="cb10-2" data-line-number="2">zerocrossStats</a>
-<a class="sourceLine" id="cb10-3" data-line-number="3"><span class="co">#&gt; $Hsig</span></a>
-<a class="sourceLine" id="cb10-4" data-line-number="4"><span class="co">#&gt; [1] 0.5313988</span></a>
-<a class="sourceLine" id="cb10-5" data-line-number="5"><span class="co">#&gt; </span></a>
-<a class="sourceLine" id="cb10-6" data-line-number="6"><span class="co">#&gt; $Hmean</span></a>
-<a class="sourceLine" id="cb10-7" data-line-number="7"><span class="co">#&gt; [1] 0.3502191</span></a>
-<a class="sourceLine" id="cb10-8" data-line-number="8"><span class="co">#&gt; </span></a>
-<a class="sourceLine" id="cb10-9" data-line-number="9"><span class="co">#&gt; $H10</span></a>
-<a class="sourceLine" id="cb10-10" data-line-number="10"><span class="co">#&gt; [1] 0.6438722</span></a>
-<a class="sourceLine" id="cb10-11" data-line-number="11"><span class="co">#&gt; </span></a>
-<a class="sourceLine" id="cb10-12" data-line-number="12"><span class="co">#&gt; $Hmax</span></a>
-<a class="sourceLine" id="cb10-13" data-line-number="13"><span class="co">#&gt; [1] 0.7724476</span></a>
-<a class="sourceLine" id="cb10-14" data-line-number="14"><span class="co">#&gt; </span></a>
-<a class="sourceLine" id="cb10-15" data-line-number="15"><span class="co">#&gt; $Tmean</span></a>
-<a class="sourceLine" id="cb10-16" data-line-number="16"><span class="co">#&gt; [1] 7.672747</span></a>
-<a class="sourceLine" id="cb10-17" data-line-number="17"><span class="co">#&gt; </span></a>
-<a class="sourceLine" id="cb10-18" data-line-number="18"><span class="co">#&gt; $Tsig</span></a>
-<a class="sourceLine" id="cb10-19" data-line-number="19"><span class="co">#&gt; [1] 9.75641</span></a></code></pre></div>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb10-1" title="1">zerocrossStats =<span class="st"> </span><span class="kw"><a href="../reference/waveStatsZC.html">waveStatsZC</a></span>(swDepthCorrected.m, <span class="dt">Fs =</span> <span class="dv">4</span>)</a>
+<a class="sourceLine" id="cb10-2" title="2">zerocrossStats</a>
+<a class="sourceLine" id="cb10-3" title="3"><span class="co">#&gt; $Hsig</span></a>
+<a class="sourceLine" id="cb10-4" title="4"><span class="co">#&gt; [1] 0.5313988</span></a>
+<a class="sourceLine" id="cb10-5" title="5"><span class="co">#&gt; </span></a>
+<a class="sourceLine" id="cb10-6" title="6"><span class="co">#&gt; $Hmean</span></a>
+<a class="sourceLine" id="cb10-7" title="7"><span class="co">#&gt; [1] 0.3502191</span></a>
+<a class="sourceLine" id="cb10-8" title="8"><span class="co">#&gt; </span></a>
+<a class="sourceLine" id="cb10-9" title="9"><span class="co">#&gt; $H10</span></a>
+<a class="sourceLine" id="cb10-10" title="10"><span class="co">#&gt; [1] 0.6438722</span></a>
+<a class="sourceLine" id="cb10-11" title="11"><span class="co">#&gt; </span></a>
+<a class="sourceLine" id="cb10-12" title="12"><span class="co">#&gt; $Hmax</span></a>
+<a class="sourceLine" id="cb10-13" title="13"><span class="co">#&gt; [1] 0.7724476</span></a>
+<a class="sourceLine" id="cb10-14" title="14"><span class="co">#&gt; </span></a>
+<a class="sourceLine" id="cb10-15" title="15"><span class="co">#&gt; $Tmean</span></a>
+<a class="sourceLine" id="cb10-16" title="16"><span class="co">#&gt; [1] 7.672747</span></a>
+<a class="sourceLine" id="cb10-17" title="17"><span class="co">#&gt; </span></a>
+<a class="sourceLine" id="cb10-18" title="18"><span class="co">#&gt; $Tsig</span></a>
+<a class="sourceLine" id="cb10-19" title="19"><span class="co">#&gt; [1] 9.75641</span></a></code></pre></div>
 <p>Multiple results are generated by <code>waveStatsZC</code>:</p>
 <ul>
 <li><p><code>Hsig</code> - Mean of the highest 1/3 of waves in the data set. Units = same as input surface heights.</p></li>
@@ -199,31 +201,31 @@
 <h2 class="hasAnchor">
 <a href="#wave-statistics-using-spectral-analysis" class="anchor"></a>Wave statistics using spectral analysis</h2>
 <p>The other option for calculating wave statistics is through spectral analysis, transforming the wave height data from the time domain to the frequency domain. Spectral analysis is perhaps more commonly used these days, particularly onboard surface wave buoys to quickly distill wave records down into manageable summary values for transmission over limited bandwidth satellite or cellular connections. Spectral analysis produces a slightly different set of summary statistics as compared to the zero-crossing algorithm. In the <code>oceanwaves</code> package, we use the <code>waveStatsSP</code> function to carry out a spectral analysis of the surface height data.</p>
-<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb11-1" data-line-number="1">spectralStats =<span class="st"> </span><span class="kw"><a href="../reference/waveStatsSP.html">waveStatsSP</a></span>(swDepthCorrected.m, <span class="dt">Fs =</span> <span class="dv">4</span>)</a>
-<a class="sourceLine" id="cb11-2" data-line-number="2">spectralStats</a>
-<a class="sourceLine" id="cb11-3" data-line-number="3"><span class="co">#&gt; $h</span></a>
-<a class="sourceLine" id="cb11-4" data-line-number="4"><span class="co">#&gt; [1] 10.45144</span></a>
-<a class="sourceLine" id="cb11-5" data-line-number="5"><span class="co">#&gt; </span></a>
-<a class="sourceLine" id="cb11-6" data-line-number="6"><span class="co">#&gt; $Hm0</span></a>
-<a class="sourceLine" id="cb11-7" data-line-number="7"><span class="co">#&gt; [1] 0.56511</span></a>
-<a class="sourceLine" id="cb11-8" data-line-number="8"><span class="co">#&gt; </span></a>
-<a class="sourceLine" id="cb11-9" data-line-number="9"><span class="co">#&gt; $Tp</span></a>
-<a class="sourceLine" id="cb11-10" data-line-number="10"><span class="co">#&gt; [1] 10.90909</span></a>
-<a class="sourceLine" id="cb11-11" data-line-number="11"><span class="co">#&gt; </span></a>
-<a class="sourceLine" id="cb11-12" data-line-number="12"><span class="co">#&gt; $m0</span></a>
-<a class="sourceLine" id="cb11-13" data-line-number="13"><span class="co">#&gt; [1] 0.01995933</span></a>
-<a class="sourceLine" id="cb11-14" data-line-number="14"><span class="co">#&gt; </span></a>
-<a class="sourceLine" id="cb11-15" data-line-number="15"><span class="co">#&gt; $T_0_1</span></a>
-<a class="sourceLine" id="cb11-16" data-line-number="16"><span class="co">#&gt; [1] 8.288296</span></a>
-<a class="sourceLine" id="cb11-17" data-line-number="17"><span class="co">#&gt; </span></a>
-<a class="sourceLine" id="cb11-18" data-line-number="18"><span class="co">#&gt; $T_0_2</span></a>
-<a class="sourceLine" id="cb11-19" data-line-number="19"><span class="co">#&gt; [1] 7.598222</span></a>
-<a class="sourceLine" id="cb11-20" data-line-number="20"><span class="co">#&gt; </span></a>
-<a class="sourceLine" id="cb11-21" data-line-number="21"><span class="co">#&gt; $EPS2</span></a>
-<a class="sourceLine" id="cb11-22" data-line-number="22"><span class="co">#&gt; [1] 0.4357626</span></a>
-<a class="sourceLine" id="cb11-23" data-line-number="23"><span class="co">#&gt; </span></a>
-<a class="sourceLine" id="cb11-24" data-line-number="24"><span class="co">#&gt; $EPS4</span></a>
-<a class="sourceLine" id="cb11-25" data-line-number="25"><span class="co">#&gt; [1] 0.6597814</span></a></code></pre></div>
+<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb11-1" title="1">spectralStats =<span class="st"> </span><span class="kw"><a href="../reference/waveStatsSP.html">waveStatsSP</a></span>(swDepthCorrected.m, <span class="dt">Fs =</span> <span class="dv">4</span>)</a>
+<a class="sourceLine" id="cb11-2" title="2">spectralStats</a>
+<a class="sourceLine" id="cb11-3" title="3"><span class="co">#&gt; $h</span></a>
+<a class="sourceLine" id="cb11-4" title="4"><span class="co">#&gt; [1] 10.45144</span></a>
+<a class="sourceLine" id="cb11-5" title="5"><span class="co">#&gt; </span></a>
+<a class="sourceLine" id="cb11-6" title="6"><span class="co">#&gt; $Hm0</span></a>
+<a class="sourceLine" id="cb11-7" title="7"><span class="co">#&gt; [1] 0.56511</span></a>
+<a class="sourceLine" id="cb11-8" title="8"><span class="co">#&gt; </span></a>
+<a class="sourceLine" id="cb11-9" title="9"><span class="co">#&gt; $Tp</span></a>
+<a class="sourceLine" id="cb11-10" title="10"><span class="co">#&gt; [1] 10.90909</span></a>
+<a class="sourceLine" id="cb11-11" title="11"><span class="co">#&gt; </span></a>
+<a class="sourceLine" id="cb11-12" title="12"><span class="co">#&gt; $m0</span></a>
+<a class="sourceLine" id="cb11-13" title="13"><span class="co">#&gt; [1] 0.01995933</span></a>
+<a class="sourceLine" id="cb11-14" title="14"><span class="co">#&gt; </span></a>
+<a class="sourceLine" id="cb11-15" title="15"><span class="co">#&gt; $T_0_1</span></a>
+<a class="sourceLine" id="cb11-16" title="16"><span class="co">#&gt; [1] 8.288296</span></a>
+<a class="sourceLine" id="cb11-17" title="17"><span class="co">#&gt; </span></a>
+<a class="sourceLine" id="cb11-18" title="18"><span class="co">#&gt; $T_0_2</span></a>
+<a class="sourceLine" id="cb11-19" title="19"><span class="co">#&gt; [1] 7.598222</span></a>
+<a class="sourceLine" id="cb11-20" title="20"><span class="co">#&gt; </span></a>
+<a class="sourceLine" id="cb11-21" title="21"><span class="co">#&gt; $EPS2</span></a>
+<a class="sourceLine" id="cb11-22" title="22"><span class="co">#&gt; [1] 0.4357626</span></a>
+<a class="sourceLine" id="cb11-23" title="23"><span class="co">#&gt; </span></a>
+<a class="sourceLine" id="cb11-24" title="24"><span class="co">#&gt; $EPS4</span></a>
+<a class="sourceLine" id="cb11-25" title="25"><span class="co">#&gt; [1] 0.6597814</span></a></code></pre></div>
 <p>The most relevant output from <code>waveStatsSP</code> is probably:</p>
 <ul>
 <li><p><code>h</code> - Average water depth. Same units as input surface heights (typically meters).</p></li>
@@ -238,10 +240,10 @@
 <h2 class="hasAnchor">
 <a href="#plotting-the-wave-statistics-results" class="anchor"></a>Plotting the wave statistics results</h2>
 <p>Both wave statistics also have built-in plots to show some information about the results. The zero-crossing function outputs frequency histograms of the number of waves in height bins and in period bins.</p>
-<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb12-1" data-line-number="1"><span class="kw"><a href="../reference/waveStatsZC.html">waveStatsZC</a></span>(swDepthCorrected.m, <span class="dt">Fs =</span> <span class="dv">4</span>, <span class="dt">plot =</span> <span class="ot">TRUE</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb12-1" title="1"><span class="kw"><a href="../reference/waveStatsZC.html">waveStatsZC</a></span>(swDepthCorrected.m, <span class="dt">Fs =</span> <span class="dv">4</span>, <span class="dt">plot =</span> <span class="ot">TRUE</span>)</a></code></pre></div>
 <p><img src="oceanwaves-vignette_files/figure-html/zcPlot-1.png" width="576"></p>
 <p>The spectral analysis function generates a spectrum, with the peak period labeled. The significant wave height is not easily visualized from this method.</p>
-<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb13-1" data-line-number="1"><span class="kw"><a href="../reference/waveStatsSP.html">waveStatsSP</a></span>(swDepthCorrected.m, <span class="dt">Fs =</span> <span class="dv">4</span>, <span class="dt">plot =</span> <span class="ot">TRUE</span>)</a></code></pre></div>
+<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb13-1" title="1"><span class="kw"><a href="../reference/waveStatsSP.html">waveStatsSP</a></span>(swDepthCorrected.m, <span class="dt">Fs =</span> <span class="dv">4</span>, <span class="dt">plot =</span> <span class="ot">TRUE</span>)</a></code></pre></div>
 <p><img src="oceanwaves-vignette_files/figure-html/spPlot-1.png" width="768"></p>
 </div>
 <div id="useful-references" class="section level2">
@@ -279,17 +281,20 @@
 </div>
 
 
+
       <footer><div class="copyright">
   <p>Developed by Luke Miller, Urs Neumeier.</p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.3.0.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.4.1.</p>
 </div>
+
       </footer>
 </div>
 
   
+
 
   </body>
 </html>
