@@ -25,7 +25,7 @@ Travis Mason and Magali Lecouturier.
 
 The release version of this package can be obtained from
 <https://cran.r-project.org/package=oceanwaves>. To install this package
-within R, do the following at the R command line:
+within R, run the following at the R command line:
 
 ``` r
 install.packages('oceanwaves')
