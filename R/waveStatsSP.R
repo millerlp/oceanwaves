@@ -114,6 +114,10 @@ waveStatsSP <- function(data, Fs, method = c('welchPSD', 'spec.pgram'),
 		}	
 		# Peak period, calculated from Frequency at maximum of spectrum 
 		Tp <- 1 / pgram$freq[which.max(pgram$spec)] # units seconds
+		# Handle the case where NA's in the input data have led to Tp 
+		# coming up as numeric(0), replace with NA
+		if (length(Tp) == 0) { Tp = NA}
+		
 	} else if (method == 'welchPSD'){
 		if (is.null(segments)){
 			# Set default segment length for windowing
@@ -147,6 +151,9 @@ waveStatsSP <- function(data, Fs, method = c('welchPSD', 'spec.pgram'),
 		}
 		# Peak period, calculated from Frequency at maximum of spectrum 
 		Tp <- 1 / wpsd$frequency[which.max(wpsd$power)]  # units seconds
+		# Handle the case where NA's in the input data have led to Tp 
+		# coming up as numeric(0), replace with NA
+		if (length(Tp) == 0) { Tp = NA}
 	}
 	
 	# Estimated variance of time series (moment 0)
