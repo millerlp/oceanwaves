@@ -51,7 +51,7 @@ prCorr <- function(pt, Fs, zpt, M = 512, CorrLim = c(0.05, 0.33), plot = FALSE )
 	# Make a copy of the input depth values
 	H_with_NaN <- pt	
 	# Get the indices of good data (not NA)
-	notNA <- which( !is.nan(pt) )
+	notNA <- which( !is.na(pt) )
 	# Make a reduced copy with only the good rows of pt
 	pt<-pt[notNA] 
 	
