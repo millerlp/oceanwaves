@@ -2,7 +2,7 @@
 % Please edit documentation in R/prCorr.R
 \name{prCorr}
 \alias{prCorr}
-\title{Correct for depth attenuation of a water surface height 
+\title{Correct for depth attenuation of a water surface elevation 
 pressure signal.}
 \usage{
 prCorr(pt, Fs, zpt, M = 512, CorrLim = c(0.05, 0.33), plot = FALSE)
@@ -25,15 +25,15 @@ default [0.05 0.33], which translate to periods of 20 sec to 3 sec).}
 corrected time series.}
 }
 \value{
-A vector of the depth-corrected surface heights (units of meters 
+A vector of the depth-corrected surface elevations (units of meters 
 usually). Any original trend in the input data (such as tide change) is 
-present in the output data. The returned surface height fluctuations will 
-typically be more extreme than the raw input surface heights.
+present in the output data. The returned surface elevation fluctuations will 
+typically be more extreme than the raw input surface elevations.
 }
 \description{
 Bottom-mounted pressure transducers suffer from pressure signal 
 attenuation when attempting to estimate surface wave heights. This 
-function corrects water surface height time series based on the
+function corrects water surface elevation time series based on the
 depth of the water column and height of the sensor above the bottom.
 }
 \examples{
