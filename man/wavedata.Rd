@@ -4,7 +4,8 @@
 \name{wavedata}
 \alias{wavedata}
 \title{Example wave records}
-\format{A data frame with 7200 rows and 4 variables:
+\format{
+A data frame with 7200 rows and 4 variables:
 \describe{
   \item{DateTime}{Date and time, with fractional seconds. UTC time zone.}
   \item{absPressure.mbar}{Absolute pressure recorded by the data logger, in 
@@ -19,7 +20,8 @@
   \item{swDepth.m}{Estimated depth in meters of the seawater column above the
   pressure data logger, converted from the swPressure.mbar value.}
   
-}}
+}
+}
 \source{
 2016 Provided by Kristin Elsmore, UC Davis Bodega Marine Laboratory
 }
