@@ -72,6 +72,10 @@ pressure was 1014 mbar).
 
 With the pressure due to the seawater alone calculated, we then want to convert pressure values into estimates of sea surface elevation so that they represent the physical height of the wave crests and troughs passing over the pressure transducer. The conversion from pressure to water column height relies on a few factors, most notably the water column temperature, since the density of the water above the pressure transducer will affect the recorded pressure. There's also potential effects of salinity (water with more salt in it will be more dense and produce a higher pressure signal also), and even local gravity. Those values can vary through the water column and make for a very complicated calculation of the conversion from pressure to depth. However, the slight differences in calculated sea surface elevation that might come from precisely knowing temperature and salinity throughout the water column when converting pressure to water column height probably aren't enough to radically bias our estimates of the height of the waves passing over the site during the short window of time typically used to estimate wave statistics (15-30 minutes). For our purposes, we will make use of a conversion function provided by the `oce` package, which is a dependency of the `oceanwaves` package and should already be installed. This conversion function, `swDepth`, assumes a constant temperature and salinity for the water column. 
 
+```{r loadoce}
+library(oce)
+```
+
 The `oce` package assumes that the pressure readings are in *deci*bar rather than *milli*bar, so we first need to convert to dbar by dividing mbar by 100.
 
 ```{r convertdecibar}
